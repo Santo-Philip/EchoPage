@@ -1,0 +1,16 @@
+---
+import Layout from "../layouts/Layout.astro";
+import WyEditor from "../components/MyEditor.astro";
+
+
+
+const seo = {
+  title: "Editor Demo",
+  description: "A dependency-free WYSIWYG editor in Astro with TypeScript",
+};
+---
+
+<Layout {...seo}>
+  <h1>TypeScript WYSIWYG Editor</h1>
+  <WyEditor initialContent="<p>Hello world!</p>" />
+</Layout>

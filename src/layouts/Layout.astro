@@ -1,16 +1,37 @@
-h
+---
 import '../styles/global.css' 
 import TopBar from '../components/TopBar.astro'; 
+
+const { title = 'Blogs', desc = 'We are building the bes bloging plpatform right here now!', keywords = 'blog, blogging, platform' , img="/logo.png"} = Astro.props;
 
 ---
 <!doctype html>
 <html lang="en" class="bg-bg-primary text-text-primary">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/logo.png" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Blogs</title>
+		<title>{title}</title>
+		<meta name="description" content={desc}/>
+		<meta name="keywords" content={keywords} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={desc} />
+		<meta property="og:image" content={img} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={Astro.url.href} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={desc} />
+		<meta name="twitter:image" content={img} />
+		<meta name="twitter:site" content="@IamSandoPhilip" />
+		<meta name="twitter:creator" content="@IamSandoPhilip" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<link rel="stylesheet" href="src/styles/global.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 	</head>
 	<body>
 		<TopBar/>

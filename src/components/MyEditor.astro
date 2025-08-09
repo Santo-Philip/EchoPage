@@ -1,0 +1,78 @@
+---
+interface Props {
+  initialContent?: string;
+}
+
+const { initialContent = "" } = Astro.props;
+---
+
+<style>
+  /* Scoped styles — will only affect this component */
+  :global(:root) {
+    --muted: #9aa4b2;
+    --accent: #06b6d4;
+  }
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .btn.active {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .editor {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 200px;
+    outline: none;
+  }
+</style>
+
+<div class="toolbar">
+  <button class="btn" data-cmd="bold"><b>B</b></button>
+  <button class="btn" data-cmd="italic"><i>I</i></button>
+  <button class="btn" data-cmd="underline"><u>U</u></button>
+</div>
+
+<div
+  class="editor"
+  id="editor"
+  contenteditable="true"
+  role="textbox"
+  aria-multiline="true"
+>
+  {initialContent ? <Fragment set:html={initialContent} /> : "Start typing..."}
+</div>
+
+<script>
+  const editor = document.getElementById("editor") as HTMLDivElement;
+
+  function runCmd(cmd: string) {
+    document.execCommand(cmd, false);
+    editor.focus();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>(".toolbar .btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const cmd = btn.dataset.cmd;
+      if (cmd) runCmd(cmd);
+    });
+  });
+
+  // Optional: expose helpers
+  (window as any).getEditorContent = () => editor.innerHTML;
+  (window as any).setEditorContent = (html: string) => {
+    editor.innerHTML = html;
+  };
+</script>
