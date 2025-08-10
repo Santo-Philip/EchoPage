@@ -15,3 +15,37 @@
 
   --color-shadow: oklch(0% 0 0 / 0.1);
 }
+
+[data-theme="dark"] {
+  --color-bg-primary: oklch(15% 0.04 260);
+  --color-bg-secondary: oklch(10% 0.03 260);
+
+  --color-text-primary: oklch(80% 0.07 260);
+  --color-text-secondary: oklch(60% 0.05 260);
+  --color-text-muted: oklch(40% 0.02 260);
+
+  --color-accent-primary: oklch(40% 0.18 45);
+  --color-accent-hover: oklch(45% 0.22 45);
+
+  --color-border: oklch(20% 0.02 260);
+
+  --color-shadow: oklch(0% 0 0 / 0.6);
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair', serif;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+html, body {
+  font-family: "Nunito", sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+    overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+

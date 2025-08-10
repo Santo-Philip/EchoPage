@@ -1,0 +1,28 @@
+---
+const { id, label, type = "text", value = "",  } = Astro.props;
+---
+
+<div class="relative w-full my-6">
+  <input
+    id={id}
+    type={type}
+    value={value}
+    placeholder=""
+    class="peer block w-full border-b-2 border-text-primary focus:border-accent-primary bg-transparent pt-4 pb-1 px-0 text-lg text-text-primary outline-none"
+  />
+  <label
+    for={id}
+    class="absolute left-0 top-2 text-text-primary text-lg transition-all
+           peer-placeholder-shown:top-5
+           peer-placeholder-shown:text-base
+           peer-placeholder-shown:text-text-primary
+           peer-focus:-top-3
+           peer-focus:text-text-primary
+           peer-focus:text-sm
+           peer-not-placeholder-shown:-top-2
+           peer-not-placeholder-shown:text-sm"
+           
+  >
+    {label}
+  </label>
+</div>

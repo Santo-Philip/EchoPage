@@ -1,16 +1,33 @@
 ---
+import FloatingInput from "../components/FloatingInput.astro";
+import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
-import WyEditor from "../components/MyEditor.astro";
-
-
-
-const seo = {
-  title: "Editor Demo",
-  description: "A dependency-free WYSIWYG editor in Astro with TypeScript",
-};
+import { Loader } from "@lucide/astro";
 ---
 
-<Layout {...seo}>
-  <h1>TypeScript WYSIWYG Editor</h1>
-  <WyEditor initialContent="<p>Hello world!</p>" />
+<Layout>
+  <div class="p-2 lg:max-w-screen-lg mx-auto overflow-x-hidden">
+    <h1 class="text-2xl md:text-4xl font-bold">Editor Page</h1>
+    <p class="text-sm text-text-secondary">
+      This is the editor page where you can create and edit content.
+    </p>
+    <FloatingInput id="title" label="Title" type="text" />
+
+    <FloatingTextArea id="desc" label="Description" rows="4" />
+
+    <div
+      id="editor"
+      contenteditable="true"
+      class="mt-4 p-2 min-h-screen w-full max-w-full overflow-y-auto overflow-x-hidden text-wrap outline-none border border-text-muted rounded-2xl box-border break-words whitespace-normal"
+    >
+    </div>
+    <div class="flex justify-end">
+      <button
+        class="bg-accent-primary hover:bg-accent-hover cursor-pointer text-text-primary mt-4 px-8 py-2 rounded-xl"
+      >
+        <p>Submit</p>
+        <p class="animate-spin hidden"><Loader /></p>
+      </button>
+    </div>
+  </div>
 </Layout>

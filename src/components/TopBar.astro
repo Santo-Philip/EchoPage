@@ -1,3 +1,97 @@
-<nav class="fixed top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 flex items-center justify-between">
+---
+import {
+  Menu,
+  ReceiptText,
+  HatGlasses,
+  Headset,
+  Store,
+  Minimize2,
+  MoonStar,
+  Sun,
+} from "@lucide/astro";
 
+const urls = [
+  { href: "/terms", label: "Terms", icon: ReceiptText },
+  { href: "/privacy", label: "Privacy", icon: HatGlasses },
+  { href: "/contact", label: "Contact", icon: Headset },
+  { href: "/about", label: "About", icon: Store },
+];
+---
+
+<nav
+  class="fixed z-50 flex top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 items-center justify-between"
+>
+  <div class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
+    <img src="/logo.png" alt="logo" height="40" width="40" />
+    <h2>EchoPage</h2>
+  </div>
+  <div class="flex gap-4">
+    <div class="hidden md:flex items-center gap-4 text-text-primary">
+      {
+        urls.map((url) => (
+          <a href={url.href} class="hover:underline hover:text-text-secondary">
+            {url.label}
+          </a>
+        ))
+      }
+    </div>
+    <div class="flex items-center gap-4 text-text-primary">
+      <div id="theme-toggle">
+        <Sun id="sun" class="hidden cursor-pointer" />
+        <MoonStar id="moon" class="cursor-pointer" />
+      </div>
+      <div id="menu-btn" class="md:hidden">
+        <Menu id="menu-icon" class="cursor-pointer" />
+        <Minimize2 id="minimize" class="cursor-pointer hidden" />
+      </div>
+    </div>
+  </div>
 </nav>
+
+<div
+  id="menu"
+  class="fixed shadow-2xl top-0 left-0 right-0 bg-bg-secondary -translate-y-full transition-all duration-500 md:hidden px-4 py-2"
+>
+  <div class="text-text-primary flex flex-col gap-4">
+    {
+      urls.map((url) => (
+        <div class="flex items-center gap-4">
+          <url.icon class="w-5 h-5" />
+          <a href={url.href} class="hover:underline hover:text-text-secondary">
+            {url.label}
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const menu = document.getElementById("menu") as HTMLDivElement;
+  const menuBtn = document.getElementById("menu-btn") as HTMLDivElement;
+  const minimize = document.getElementById("minimize") as HTMLDivElement;
+  const menuIcon = document.getElementById("menu-icon") as HTMLDivElement;
+  const theme = document.getElementById("theme-toggle") as HTMLDivElement;
+  const sun = document.getElementById("sun") as HTMLDivElement;
+  const moon = document.getElementById("moon") as HTMLDivElement;
+
+  theme.addEventListener("click", () => {
+    toggleTheme();
+    sun.classList.toggle("hidden");
+    moon.classList.toggle("hidden");
+  });
+
+  function toggleTheme() {
+    const current = document.documentElement.dataset.theme;
+    const next = current === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = next;
+    document.cookie = `theme=${next}; path=/; max-age=31536000`;
+  }
+
+  menuBtn.addEventListener("click", () => {
+    menu.classList.toggle("top-12");
+    menu.classList.toggle("-translate-y-full");
+    minimize.classList.toggle("hidden");
+    menuIcon.classList.toggle("hidden");
+  });
+</script>
