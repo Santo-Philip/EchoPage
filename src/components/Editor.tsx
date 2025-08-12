@@ -1,254 +1,203 @@
-import { useRef, useState, useEffect, useMemo, type KeyboardEvent, type ClipboardEvent } from "react";
+import { useState, useRef } from "react";
 import type { Block } from "../lib/blockTypes";
-import { getAlignmentStyle } from "../lib/getAlignmentElement";
-import { getTag } from "../lib/getTag";
-import { GripVertical } from "lucide-react";
-import { commands, type Command } from "../lib/commands";
-import { CommandMenu } from "./commandMenu";
+import CommandMenu from "./commandMenu";
+import { getCaretOffset, setCaretOffset } from "../lib/position";
 
 function EditorTab() {
-  const [cmdOpen, setCmdOpen] = useState(false);
-  const [cmd, setCmd] = useState("");
-  const [cmdPos, setCmdPos] = useState<{ x: number; y: number } | null>(null);
-  const [activeBlock, setActiveBlock] = useState<string | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const filteredCommands = useMemo(
-    () =>
-      commands.filter((cmds) => cmds.name.toLowerCase().includes(cmd.toLowerCase())),
-    [cmd]
-  );
-
+  const [openCommand, setOpenCommand] = useState(false);
+  const [command, setCommand] = useState("");
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [blocks, setBlocks] = useState<Block[]>([
-    { id: "1", type: "paragraph", content: "" },
+    {
+      id: crypto.randomUUID(),
+      index: 1,
+      type: "paragraph",
+      content: "",
+    },
   ]);
 
-  const refs = useRef<Record<string, HTMLDivElement | null>>({});
+  const blockRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  useEffect(() => {
-    Object.entries(refs.current).forEach(([id, el]) => {
-      if (el && !el.innerText) {
-        const block = blocks.find((b) => b.id === id);
-        if (block) {
-          el.innerText = typeof block.content === "string" ? block.content : block.content.url || "";
-        }
-      }
-    });
-  }, [blocks]);
-
-  const getCursorPosition = (): { x: number; y: number } => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      return { x: rect.left, y: rect.bottom + 10 }; 
+  const handleCommand = (text: string) => {
+    if (text.startsWith("/")) {
+      setOpenCommand(true);
+      setCommand(text.slice(1));
+    } else {
+      setOpenCommand(false);
     }
-    return { x: 0, y: 0 };
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, id: string) => {
-    const el = refs.current[id];
-    if (!el) return;
+  const newNode = (type: Block["type"]) => {
+    setBlocks((prev) => {
+      const newBlock =
+        type === "image" || type === "video" || type === "embed"
+          ? {
+              id: crypto.randomUUID(),
+              type,
+              content: { url: "" },
+              index: prev.length + 1,
+            }
+          : {
+              id: crypto.randomUUID(),
+              type,
+              content: "",
+              index: prev.length + 1,
+            };
 
-    if (e.key === "/" && !cmdOpen) {
-      e.preventDefault(); 
-      setCmdOpen(true);
-      setCmd("");
-      setCmdPos(getCursorPosition());
-      setActiveBlock(id);
-      setSelectedIndex(0);
-      return;
-    }
-
-    if (cmdOpen && activeBlock === id) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const filteredCommands = commands.filter((cmds) =>
-          cmds.name.toLowerCase().includes(cmd.toLowerCase())
-        );
-        if (filteredCommands[selectedIndex]) {
-          handleCommandSelect(filteredCommands[selectedIndex]);
+      setTimeout(() => {
+        const ref = blockRefs.current.get(newBlock.id);
+        if (ref) {
+          ref.focus();
         }
-        return;
-      }
+      }, 0);
 
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
-        return;
-      }
+      return [...prev, newBlock];
+    });
+  };
 
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % filteredCommands.length);
-        return;
-      }
-
-      if (e.key === "Escape") {
-        e.preventDefault();
-        closeCommandMenu();
-        return;
-      }
+  const handleInput = (text: string, blockId: string) => {
+    const el = blockRefs.current.get(blockId);
+    const caretPos = el ? getCaretOffset(el) : 0;
+    if (text.startsWith("/")) {
+      setOpenCommand(true);
+      setCommand(text.slice(1));
+    } else {
+      setOpenCommand(false);
     }
 
-    
+    setBlocks((prev) =>
+      prev.map((b) => {
+        if (b.id !== blockId) return b;
+        if (b.type === "paragraph" && b.content !== text) {
+          return { ...b, content: text };
+        }
+        if (
+          (b.type === "image" || b.type === "video" || b.type === "embed") &&
+          typeof b.content === "object" &&
+          b.content.url !== text
+        ) {
+          return { ...b, content: { ...b.content, url: text } };
+        }
+        return b;
+      })
+    );
+
+    requestAnimationFrame(() => {
+      const elNow = blockRefs.current.get(blockId);
+      if (elNow) setCaretOffset(elNow, caretPos);
+    });
+  };
+
+ const removeNode = (blockId: string, e: HTMLElement) => {
+  const currentIndex = blocks.findIndex((b) => b.id === blockId);
+  if (currentIndex > 0) {
+    const currBlock = blocks[currentIndex];
+    const prevBlock = blocks[currentIndex - 1];
+    const prevLength =
+      typeof prevBlock.content === "string"
+        ? prevBlock.content.length
+        : typeof prevBlock.content === "object" && prevBlock.content?.url
+        ? prevBlock.content.url.length
+        : 0;
+
+    let mergedContent: any;
+    if (
+      (prevBlock.type === "image" ||
+        prevBlock.type === "video" ||
+        prevBlock.type === "embed") &&
+      typeof prevBlock.content === "object"
+    ) {
+      const prevUrl = prevBlock.content.url || "";
+      const currUrl =
+        (currBlock.type === "image" ||
+          currBlock.type === "video" ||
+          currBlock.type === "embed") &&
+        typeof currBlock.content === "object"
+          ? currBlock.content.url
+          : typeof currBlock.content === "string"
+          ? currBlock.content
+          : "";
+      mergedContent = { ...prevBlock.content, url: prevUrl + currUrl };
+    } else {
+      mergedContent =
+        (typeof prevBlock.content === "string" ? prevBlock.content : "") +
+        (typeof currBlock.content === "string" ? currBlock.content : "");
+    }
+
+    const newBlocks = [...blocks];
+    newBlocks[currentIndex - 1] = { ...prevBlock, content: mergedContent };
+    newBlocks.splice(currentIndex, 1);
+    setBlocks(newBlocks);
+    e.blur();
+
+    setTimeout(() => {
+      const prevEl = blockRefs.current.get(prevBlock.id);
+      if (prevEl) {
+        prevEl.focus();
+        const range = document.createRange();
+        const node = prevEl.firstChild;
+        if (node && node.nodeType === Node.TEXT_NODE) {
+          range.setStart(node, Math.min(prevLength, node.textContent?.length ?? 0));
+        } else {
+          range.selectNodeContents(prevEl);
+          range.collapse(true);
+        }
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+    }, 0);
+  }
+};
+
+
+  const handleKeyboard = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    blockId: string
+  ) => {
+    const selection = window.getSelection();
+    const isAtStart = selection?.focusOffset === 0;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const newBlock: Block = {
-        id: `${Date.now()}-${Math.random()}`, 
-        type: "paragraph",
-        content: "",
-      };
-      setBlocks((prev) => [
-        ...prev.slice(0, prev.findIndex((b) => b.id === id) + 1),
-        newBlock,
-        ...prev.slice(prev.findIndex((b) => b.id === id) + 1),
-      ]);
-      setTimeout(() => {
-        refs.current[newBlock.id]?.focus();
-      }, 0);
+      newNode("paragraph");
     }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>, id: string) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData("text/plain");
-
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) return;
-
-    const range = selection.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(document.createTextNode(text));
-
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    handleInput(id);
-  };
-
-  const handleInput = (id: string) => {
-    const el = refs.current[id];
-    if (!el) return;
-
-    const text = el.innerText;
-    setBlocks((prev) =>
-      prev.map((block) => {
-        if (block.id !== id) return block;
-
-        if (cmdOpen && activeBlock === id) {
-          
-          const selection = window.getSelection();
-          if (selection && selection.anchorNode) {
-            const textBeforeCursor =
-              (selection.anchorNode as Text).data?.slice(0, selection.anchorOffset) || text;
-            const lastSlashIndex = textBeforeCursor.lastIndexOf("/");
-            if (lastSlashIndex !== -1) {
-              const query = textBeforeCursor.slice(lastSlashIndex + 1);
-              setCmd(query);
-              setCmdPos(getCursorPosition());
-            } else {
-              closeCommandMenu();
-            }
-          }
-        }
-
-        return { ...block, content: text };
-      })
-    );
-  };
-
-  const handleCommandSelect = (command: Command) => {
-    if (!activeBlock) return;
-
-    setBlocks((prev) =>
-      prev.map((block) => {
-        if (block.id !== activeBlock) return block;
-
-        const el = refs.current[activeBlock];
-        let newContent: string | { url: string } = block.content;
-        if (el) {
-          const text = el.innerText;
-          const lastSlashIndex = text.lastIndexOf(`/${cmd}`);
-          newContent = lastSlashIndex !== -1 ? text.slice(0, lastSlashIndex) : text;
-          el.innerText = typeof newContent === "string" ? newContent : "";
-        }
-
-        
-        if (["image", "video", "embed"].includes(command.type)) {
-          newContent = { url: "" }; 
-        }
-
-        return { ...block, type: command.type, content: newContent };
-      })
-    );
-
-    closeCommandMenu();
-  };
-
-  const closeCommandMenu = () => {
-    setCmdOpen(false);
-    setCmd("");
-    setCmdPos(null);
-    setActiveBlock(null);
-    setSelectedIndex(0);
+    if (e.key === "Backspace" && blocks.length > 1 && isAtStart) {
+      e.preventDefault();
+      removeNode(blockId, e.currentTarget);
+    }
   };
 
   return (
-    <div
-      id="editor"
-      className="min-h-screen outline-none border border-text-muted rounded-xl p-4"
-    >
-      {blocks.map((block) => {
-        const Tag = getTag(block);
+    <div className="rounded-2xl relative border border-text-muted min-h-screen">
+      <CommandMenu
+        open={openCommand}
+        setOpen={setOpenCommand}
+        command={command}
+        setCommand={setCommand}
+        position={{ x: 0, y: 0 }}
+      />
 
-        
-        if (["image", "video", "embed"].includes(block.type)) {
-          return (
-            <div key={block.id} className="relative group">
-              <GripVertical
-                className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-move"
-                size={20}
-              />
-              <Tag
-                ref={(el: HTMLDivElement | null) => (refs.current[block.id] = el)}
-                src={typeof block.content === "string" ? block.content : block.content.url}
-                className="outline-none border-none rounded-xl"
-                style={getAlignmentStyle(block)}
-              />
-            </div>
-          );
-        }
-
-        return (
-          <div key={block.id} className="relative group">
-            <GripVertical
-              className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-move"
-              size={20}
-            />
-            <Tag
-              ref={(el: HTMLDivElement | null) => (refs.current[block.id] = el)}
-              className="outline-none border-none focus:bg-text-primary/30 rounded-xl p-2"
+      {blocks.map((block) => (
+        <div key={block.id}>
+          {block.type === "paragraph" && (
+            <div
+              className="outline-none focus:bg-text-muted/30 rounded-xl p-2"
               contentEditable
               suppressContentEditableWarning
-              style={getAlignmentStyle(block)}
-              onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => handleKeyDown(e, block.id)}
-              onInput={() => handleInput(block.id)}
-              onPaste={(e: ClipboardEvent<HTMLDivElement>) => handlePaste(e, block.id)}
-            />
-          </div>
-        );
-      })}
-      {cmdOpen && cmdPos && (
-        <CommandMenu
-          query={cmd}
-          position={cmdPos}
-          selectedIndex={selectedIndex}
-          onSelect={handleCommandSelect}
-          onClose={closeCommandMenu}
-        />
-      )}
+              onInput={(e) =>
+                handleInput((e.target as HTMLDivElement).innerText, block.id)
+              }
+              onKeyDown={(e) => handleKeyboard(e, block.id)}
+              ref={(el) => {
+                if (el) blockRefs.current.set(block.id, el);
+                else blockRefs.current.delete(block.id);
+              }}
+            >
+              {block.content}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
