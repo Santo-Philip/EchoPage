@@ -3,6 +3,7 @@ import FloatingInput from "../components/FloatingInput.astro";
 import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
+import EditorTab from "../components/Editor.tsx";
 ---
 
 <Layout>
@@ -15,12 +16,7 @@ import { Loader } from "@lucide/astro";
 
     <FloatingTextArea id="desc" label="Description" rows="4" />
 
-    <div
-      id="editor"
-      contenteditable="true"
-      class="mt-4 p-2 min-h-screen w-full max-w-full overflow-y-auto overflow-x-hidden text-wrap outline-none border border-text-muted rounded-2xl box-border break-words whitespace-normal"
-    >
-    </div>
+    <EditorTab client:load/>
     <div class="flex justify-end">
       <button
         class="bg-accent-primary hover:bg-accent-hover cursor-pointer text-text-primary mt-4 px-8 py-2 rounded-xl"
@@ -30,4 +26,5 @@ import { Loader } from "@lucide/astro";
       </button>
     </div>
   </div>
+  
 </Layout>

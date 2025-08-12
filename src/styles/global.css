@@ -49,3 +49,28 @@ html, body {
   box-sizing: border-box;
 }
 
+.editor::selection {
+  background-color: var(--color-accent-hover);
+  color: var(--color-bg-primary);
+}
+
+.editor h1 {
+font-size: 2rem;
+line-height: 1.2;
+font-weight: 700;
+
+}
+
+.editor h2 {
+  font-size: 1.2rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.editor:empty::before {
+  content: "Write your content here...";
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-style: italic;
+
+}
