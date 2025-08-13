@@ -87,7 +87,6 @@ function EditorTab() {
       const updated = prev.map((b) =>
         b.id === blockId && b.type === "paragraph" ? { ...b, content: text } : b
       );
-
       setPosition(getSmartMenuPosition());
       console.log("Position:", position);
       console.log("Updated blocks:", updated);
@@ -174,15 +173,39 @@ function EditorTab() {
     e: React.KeyboardEvent<HTMLDivElement>,
     blockId: string
   ) => {
-    const selection = window.getSelection();
-    const isAtStart = selection?.focusOffset === 0;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      newNode("paragraph");
+
+      const el = blockRefs.current.get(blockId);
+      if (!el) return;
+
+      const selection = window.getSelection();
+      const caretPos = selection?.focusOffset ?? 0;
+      const textLength = el.innerText.length;
+
+      const isCaretAtEnd = caretPos === textLength;
+
+      const currentBlock = blocks.find((b) => b.id === blockId);
+
+      if (
+        currentBlock?.type === "numbered-list" ||
+        currentBlock?.type === "bulleted-list" ||
+        !isCaretAtEnd
+      ) {
+        document.execCommand("insertLineBreak");
+      } else {
+        const index = blocks.findIndex((b) => b.id === blockId);
+        newNode("paragraph");
+      }
     }
-    if (e.key === "Backspace" && blocks.length > 1 && isAtStart) {
-      e.preventDefault();
-      removeNode(blockId, e.currentTarget);
+
+    if (e.key === "Backspace" && blocks.length > 1) {
+      const selection = window.getSelection();
+      const isAtStart = selection?.focusOffset === 0;
+      if (isAtStart) {
+        e.preventDefault();
+        removeNode(blockId, e.currentTarget);
+      }
     }
   };
 
@@ -206,7 +229,8 @@ function EditorTab() {
         <div key={block.id}>
           {block.type === "paragraph" && (
             <div
-              className="outline-none focus:bg-text-muted/30 rounded-xl p-2"
+              className="editor outline-none focus:bg-text-muted/30 rounded-xl p-2"
+              data-placeholder="Use / to open commands..."
               contentEditable
               ref={(el) => {
                 if (el) {

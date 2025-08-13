@@ -75,10 +75,8 @@ font-weight: 700;
   font-weight: 500;
 }
 
-.editor:empty::before {
-  content: "Write your content here...";
-  font-weight: 600;
-  color: var(--color-text-muted);
-  font-style: italic;
-
+.editor:empty:before {
+  content: attr(data-placeholder);
+  color: gray;
+  pointer-events: none; 
 }
