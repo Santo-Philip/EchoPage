@@ -3,7 +3,7 @@ import FloatingInput from "../components/FloatingInput.astro";
 import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
-import EditorTab from "../components/Editor.jsx";
+import EditorTab from "../components/Editor.js";
 ---
 
 <Layout>
@@ -16,10 +16,10 @@ import EditorTab from "../components/Editor.jsx";
 
     <FloatingTextArea id="desc" label="Description" rows="4" />
 
-    <EditorTab client:load/>
+    <EditorTab client:only/>
     <div class="flex justify-end">
       <button
-        class="bg-accent-primary hover:bg-accent-hover cursor-pointer text-text-primary mt-4 px-8 py-2 rounded-xl"
+        class="bg-accent-primary hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl"
       >
         <p>Submit</p>
         <p class="animate-spin hidden"><Loader /></p>

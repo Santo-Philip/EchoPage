@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import './_variables.scss';
+@import './_keyframe-animations.scss';
 
 @theme {
   --color-bg-primary: oklch(95% 0.04 260);
@@ -80,3 +82,21 @@ font-weight: 700;
   color: gray;
   pointer-events: none; 
 }
+
+.tiptap{
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-text-muted);
+  width: 100%;
+}
+
+.tiptap p.is-empty::before {
+  color: var(--color-text-muted);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+
+
