@@ -1,35 +1,45 @@
-import { Extension } from '@tiptap/core'
-import Suggestion from '@tiptap/suggestion'
+import { Extension } from "@tiptap/core";
+import Suggestion from "@tiptap/suggestion";
 
 export const SlashCommand = Extension.create({
-  name: 'slashCommand',
+  name: "slashCommand",
 
   addOptions() {
     return {
-      setShow: undefined, // pass your React setShow
-    }
+      setShow: undefined,
+      setRange: undefined,
+    };
   },
 
   addProseMirrorPlugins() {
     return [
       Suggestion({
         editor: this.editor,
-        char: '/',
-        items: () => [], // no items needed yet
-        command: () => {}, // no-op command
+        char: "/",
+        startOfLine: false,
+
         render: () => {
           return {
-            onStart: () => {
-              this.options.setShow?.(true) 
-                  console.log("sdada")
+            onStart: (props) => {
+              this.options.setRange?.(props.range);
+              this.options.setShow?.(true);
             },
             onExit: () => {
-              this.options.setShow?.(false) 
-                  console.log("exit")
+              this.options.setShow?.(false);
+              this.editor?.chain().focus().run();
             },
-          }
+            onKeyDown: ({ event }) => {
+              if (event.key === "Escape") {
+                console.log("SlashCommand: Escape pressed, hiding menu");
+                this.options.setShow?.(false);
+                this.editor?.chain().focus().run();
+                return true;
+              }
+              return false;
+            },
+          };
         },
       }),
-    ]
+    ];
   },
-})
+});

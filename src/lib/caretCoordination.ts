@@ -1,5 +1,5 @@
-import { Extension } from '@tiptap/core'
-import { Plugin } from '@tiptap/pm/state'
+import { Extension } from '@tiptap/core';
+import { Plugin } from '@tiptap/pm/state';
 
 export const CaretPosition = Extension.create({
   name: 'caretPosition',
@@ -7,7 +7,7 @@ export const CaretPosition = Extension.create({
   addOptions() {
     return {
       setCoords: undefined,
-    }
+    };
   },
 
   addProseMirrorPlugins() {
@@ -15,38 +15,47 @@ export const CaretPosition = Extension.create({
       new Plugin({
         props: {
           handleTextInput: (view, from, to, text) => {
-            if (!this.options.setCoords) return false
+            if (!this.options.setCoords) return false;
 
-            const { $anchor } = view.state.selection
-            const coords = view.coordsAtPos($anchor.pos)
+            try {
+              const { $anchor } = view.state.selection;
+              const coords = view.coordsAtPos($anchor.pos);
 
-            this.options.setCoords({
-              top: coords.top,
-              bottom: coords.bottom,
-              left: coords.left,
-              right: coords.right,
-            })
+              if (coords) {
+                this.options.setCoords({
+                  left: coords.left,
+                  bottom: coords.bottom,
+                });
+              }
+            } catch (error) {
+              console.error('CaretPosition: Error getting coords on text input:', error);
+            }
 
-            return false
+            return false;
           },
 
           handleKeyDown: (view, event) => {
-            if (!this.options.setCoords) return false
+            if (!this.options.setCoords) return false;
 
-            const { $anchor } = view.state.selection
-            const coords = view.coordsAtPos($anchor.pos)
+            try {
+              const { $anchor } = view.state.selection;
+              const coords = view.coordsAtPos($anchor.pos);
 
-            this.options.setCoords({
-              top: coords.top,
-              bottom: coords.bottom,
-              left: coords.left,
-              right: coords.right,
-            })
+              if (coords) {
+                this.options.setCoords({
+                  left: coords.left,
+                  bottom: coords.bottom,
+                });
+               
+              }
+            } catch (error) {
+              console.error('CaretPosition: Error getting coords on keydown:', error);
+            }
 
-            return false
+            return false;
           },
         },
       }),
-    ]
+    ];
   },
-})
+});
