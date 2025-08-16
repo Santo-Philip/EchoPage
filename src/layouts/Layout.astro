@@ -8,7 +8,7 @@ const cookies = Astro.cookies.get('theme')?.value ||  "light";
 const theme = cookies === 'dark' ? 'dark' : 'light';
 
 const {
-  title = "Home | EchoPage",
+  title = "Home",
   desc = "We are building the best blogging plpatform right here now!",
   keywords = "blog,EchoPage, EchoBlog, blogging, platform",
   img = "/logo.png",
@@ -22,7 +22,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{title} | {import.meta.env.NAME}</title>
     <meta name="description" content={desc} />
     <meta name="keywords" content={keywords} />
     <meta property="og:title" content={title} />

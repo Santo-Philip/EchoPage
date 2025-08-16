@@ -1,0 +1,43 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="404 | Page Not Found" desc="Oops! The page you’re looking for got lost in the void.">
+  <div class="flex items-center justify-center min-h-screen bg-background px-4">
+    <div class="text-center max-w-md">
+      <!-- Big 404 -->
+      <h1 class="text-9xl font-extrabold text-accent-primary">404</h1>
+      
+      <!-- Funny line -->
+      <p class="mt-4 text-lg text-text-secondary">
+        Oops! Looks like this page went out for a <span class="font-semibold">coffee break ☕</span>  
+        …and never came back.  
+      </p>
+
+      <!-- Meme-y gif (optional) -->
+      <div class="mt-6">
+        <img 
+          src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" 
+          alt="Confused Travolta" 
+          class="rounded-xl shadow-md mx-auto"
+        />
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+
+        <a
+          href="/"
+          class="rounded-xl border border-accent-primary text-accent-primary px-6 py-3 font-semibold hover:bg-accent-primary hover:text-text-primary transition"
+        >
+          📝 Read Articles Instead
+        </a>
+      </div>
+
+      <!-- Extra joke -->
+      <p class="mt-6 text-xs text-text-muted">
+        (Psst... if you keep ending up here, maybe we should hire you as our official bug hunter 🐞)  
+      </p>
+    </div>
+  </div>
+</Layout>
