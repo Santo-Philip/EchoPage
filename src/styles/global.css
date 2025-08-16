@@ -98,5 +98,56 @@ font-weight: 700;
   pointer-events: none;
 }
 
+.editor p {
+  width: 100%;
+}
 
+.ProseMirror code {
+  display: block;
+  background-color: black;
+  color: aliceblue;
+  padding: 8px 12px;
+  font-family: monospace;
+  width: 100%;
+  box-sizing: border-box; 
+}
 
+.ProseMirror li {
+  list-style: disc;
+  margin-left: 32px;
+}
+.ProseMirror a {
+  color: var(--color-text-secondary);
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover{
+  color: var(--color-text-primary);
+}
+
+.ProseMirror blockquote {
+  position: relative;
+  border-left: 3px solid #3b82f6; 
+  padding-left: 1.25rem;
+  margin: 1rem 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.ProseMirror blockquote::before {
+  content: "“";
+  position: absolute;
+  left: -0.75rem;
+  top: -0.25rem;
+  font-size: 2rem;
+  color: #3b82f6;
+}
+
+.ProseMirror div[data-youtube-video] {
+  width: 100%;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  justify-content: center;
+}
