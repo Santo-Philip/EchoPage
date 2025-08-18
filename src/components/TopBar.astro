@@ -1,4 +1,5 @@
 ---
+import { supabase } from "@/lib/supabase";
 import {
   Menu,
   ReceiptText,
@@ -16,6 +17,10 @@ const urls = [
   { href: "/contact", label: "Contact", icon: Headset },
   { href: "/about", label: "About", icon: Store },
 ];
+const { data: { user }, error } = await supabase.auth.getUser();
+
+const avatar = user?.user_metadata?.avatar_url || '/default-avatar.png';
+const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
 ---
 
 <nav
@@ -40,6 +45,23 @@ const urls = [
         <Sun id="sun" class="hidden cursor-pointer" />
         <MoonStar id="moon" class="cursor-pointer" />
       </div>
+      {user?.id ? (
+      <>
+        <a href="/dashboard" class="flex items-center border border-text-primary p-1 rounded-full gap-2 cursor-pointer">
+         <span class="hidden md:inline font-semibold ">{displayName}</span>
+          <img src={avatar} alt={displayName} class="rounded-full w-8 h-8"/>
+         
+        </a>
+      </>
+    ) : (
+      <a href="/api/auth/google" class="px-3 py-1 border border-gray-500 rounded-full flex items-center gap-2 hover:bg-text-primary/20">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="10" r="3"/>
+          <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
+        </svg>
+      </a>
+    )}
       <div id="menu-btn" class="md:hidden">
         <Menu id="menu-icon" class="cursor-pointer" />
         <Minimize2 id="minimize" class="cursor-pointer hidden" />

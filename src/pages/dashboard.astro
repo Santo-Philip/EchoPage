@@ -1,22 +1,39 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+const { data, error } = await supabase.auth.getUser();
 
 const user = {
-  name: "John Doe", // Later this will come from Supabase auth
-  email: "john@example.com"
+  name: data.user?.user_metadata.full_name,
+  email: data.user?.email,
 };
+
+if (error || !data.user.id) {
+    return Astro.redirect('/')
+}
 ---
 
 <Layout title="Dashboard " desc="Welcome to your dashboard">
   <section class="max-w-screen-md mx-auto p-2">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    >
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {user.name} 👋</h1>
-        <p class="text-gray-600">Manage your posts and account settings here.</p>
+        <h1 class="text-3xl font-bold text-gray-900">
+          Welcome back, {user.name} 👋
+        </h1>
+        <p class="text-gray-600">
+          Manage your posts and account settings here.
+        </p>
       </div>
-      <button class="bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl">
+      <form action="api/auth/signout" method="get">
+      <button
+        class="bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl"
+      >
         Logout
       </button>
+      </form>
     </div>
 
     <!-- Stats Section -->
@@ -43,10 +60,12 @@ const user = {
     <div class="mt-12">
       <h2 class="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
       <div class="p-2 flex justify-center gap-6">
-        <a href="/editor" class="bg-blue-500 hover:bg-blue-600 text-white font-medium p-6 rounded-2xl text-center">
+        <a
+          href="/editor"
+          class="bg-blue-500 hover:bg-blue-600 text-white font-medium p-6 rounded-2xl text-center"
+        >
           ✍️ Write New Post
         </a>
-
       </div>
     </div>
   </section>
