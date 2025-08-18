@@ -47,6 +47,7 @@ if (!url) {
     <EditorTab client:only />
     <div class="flex justify-end">
       <button
+      id="smtbtn"
         class="bg-accent-primary hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl"
       >
         <p>Submit</p>
@@ -54,4 +55,22 @@ if (!url) {
       </button>
     </div>
   </div>
+  <script>
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
+
+    const title = document.getElementById('title') as HTMLInputElement;
+    const desc = document.getElementById('desc') as HTMLTextAreaElement;
+    const btn = document.getElementById('smtbtn') as HTMLButtonElement;
+
+    title.addEventListener('input',() =>{
+      const id = getSearchParam('id')
+      autoSave(id, { title : title.value });
+    })
+
+    desc.addEventListener('input',() =>{
+      const id = getSearchParam('id')
+      autoSave(id, { desc : desc.value });
+    })
+</script>
 </Layout>

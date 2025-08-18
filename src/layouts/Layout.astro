@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import TopBar from "../components/TopBar.astro";
 import Footer from "../components/Footer.astro";
+import Toasts from "@/components/Toasts";
 
 
 const cookies = Astro.cookies.get('theme')?.value ||  "light";
@@ -53,6 +54,7 @@ const {
   <body>
     <TopBar />
     <div class="w-full h-12"></div>
+    <Toasts client:load/>
     <slot />
     <Footer/>
   </body>

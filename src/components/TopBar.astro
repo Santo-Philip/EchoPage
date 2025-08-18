@@ -34,7 +34,7 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
     <div class="hidden md:flex items-center gap-4 text-text-primary">
       {
         urls.map((url) => (
-          <a href={url.href} class="hover:underline hover:text-text-secondary">
+          <a href={url.href} class="hover:underline hover:text-accent-primary">
             {url.label}
           </a>
         ))
@@ -42,14 +42,14 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
     </div>
     <div class="flex items-center gap-4 text-text-primary">
       <div id="theme-toggle">
-        <Sun id="sun" class="hidden cursor-pointer" />
-        <MoonStar id="moon" class="cursor-pointer" />
+        <Sun id="sun" class="hidden cursor-pointer hover:text-amber-500" />
+        <MoonStar id="moon" class="cursor-pointer hover:text-accent-primary" />
       </div>
       {user?.id ? (
       <>
-        <a href="/dashboard" class="flex items-center border border-text-primary p-1 rounded-full gap-2 cursor-pointer">
+        <a href="/dashboard" class="flex items-center border border-text-primary/40 md:pl-2 p-1 rounded-full gap-2 cursor-pointer">
          <span class="hidden md:inline font-semibold ">{displayName}</span>
-          <img src={avatar} alt={displayName} class="rounded-full w-8 h-8"/>
+          <img src={avatar} alt={displayName} class="rounded-full w-6 h-6"/>
          
         </a>
       </>
