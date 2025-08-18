@@ -5,10 +5,13 @@ import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
 import EditorTab from "../components/Editor.js";
 import { supabase } from "@/lib/supabase";
+import ThumbnailUploader from "@/components/ThumbnailUploader";
 
 const url = Astro.url.searchParams.get("id");
 const { data: userData, error: userError } = await supabase.auth.getUser();
 const userId = userData.user?.id;
+let title: string = '';
+let desc : string = ''
 
 if (!userId) {
   return Astro.redirect("/");
@@ -30,7 +33,9 @@ if (!url) {
     return Astro.redirect(`/editor?id=${id}`);
   }
 } else {
-  console.log(url);
+  const {data,error} = await supabase.from('draft').select('*').eq('id', url)
+  title = data && data.length > 0 ? data[0].title : '';
+  desc = data && data.length > 0 ? data[0].desc : '';
 }
 ---
 
@@ -40,9 +45,12 @@ if (!url) {
     <p class="text-sm text-text-secondary p-2">
       This is the editor page where you can create and edit content.
     </p>
-    <FloatingInput id="title" label="Title" type="text" />
+    <ThumbnailUploader client:only/>
+    <div>
+    <FloatingInput id="title" label="Title" type="text" value={title ? title : ''} />
 
-    <FloatingTextArea id="desc" label="Description" rows="4" />
+    <FloatingTextArea id="desc" label="Description" rows="4" value={desc ? desc : ''}/>
+    </div>
 
     <EditorTab client:only />
     <div class="flex justify-end">
