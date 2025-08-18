@@ -2,26 +2,51 @@
 const { id, label, rows = 2, value = "", placeholder = " " } = Astro.props;
 ---
 
-<div class="relative w-full my-6">
-  <textarea
-  maxlength="350"
-    id={id}
-    rows={rows}
-    placeholder={placeholder}
-    class="peer block w-full resize-y border-b-2 border-text-primary focus:border-accent-primary bg-transparent pt-4 pb-1 px-2 text-lg text-text-primary outline-none"
+<style>
+.textarea-group {
+  position: relative;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.textarea-group textarea {
+  width: 100%;
+  resize: vertical;
+  border: none;
+  border-bottom: 2px solid var(--text-primary, #333);
+  background: transparent;
+  padding: 1rem 0.5rem 0.5rem;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  outline: none;
+  min-height: 3rem;
+}
+
+.textarea-group label {
+  position: absolute;
+  left: 0.5rem;
+  top: 1rem;
+  font-size: 1.125rem;
+  color: var(--text-primary, #333);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.textarea-group textarea:focus + label,
+.textarea-group textarea:not(:placeholder-shown) + label {
+  top: -0.4rem;
+  font-size: 0.875rem;
+  color: var(--accent-primary, #0077ff);
+}
+
+</style>
+
+<div class="textarea-group">
+  <textarea 
+    id={id} 
+    rows={rows} 
+    placeholder=" "  
+    maxlength="350"
   >{value}</textarea>
-  <label
-    for={id}
-    class="absolute left-0 top-3 text-text-primary text-lg transition-all
-           peer-placeholder-shown:top-5
-           peer-placeholder-shown:text-base
-           peer-placeholder-shown:text-text-primary
-           peer-focus:-top-4
-           peer-focus:text-text-primary
-           peer-focus:text-sm
-           peer-not-placeholder-shown:-top-4
-           peer-not-placeholder-shown:text-sm"
-  >
-    {label}
-  </label>
+  <label for={id}>{label}</label>
 </div>

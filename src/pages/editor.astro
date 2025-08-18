@@ -4,6 +4,34 @@ import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
 import EditorTab from "../components/Editor.js";
+import { supabase } from "@/lib/supabase";
+
+const url = Astro.url.searchParams.get("id");
+const { data: userData, error: userError } = await supabase.auth.getUser();
+const userId = userData.user?.id;
+
+if (!userId) {
+  return Astro.redirect("/");
+}
+
+if (!url) {
+  console.log(userId);
+  const { data, error } = await supabase
+    .from("draft")
+    .insert({ updated_at: new Date().toISOString(), author: userId })
+    .select("id");
+
+  if (error) {
+    console.error(error);
+  }
+
+  if (data && data.length > 0) {
+    const id = data[0].id;
+    return Astro.redirect(`/editor?id=${id}`);
+  }
+} else {
+  console.log(url);
+}
 ---
 
 <Layout>
@@ -16,7 +44,7 @@ import EditorTab from "../components/Editor.js";
 
     <FloatingTextArea id="desc" label="Description" rows="4" />
 
-    <EditorTab client:only/>
+    <EditorTab client:only />
     <div class="flex justify-end">
       <button
         class="bg-accent-primary hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl"
@@ -26,5 +54,4 @@ import EditorTab from "../components/Editor.js";
       </button>
     </div>
   </div>
-  
 </Layout>

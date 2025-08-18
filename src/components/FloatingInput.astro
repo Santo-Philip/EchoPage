@@ -1,28 +1,49 @@
 ---
-const { id, label, type = "text", value = "",  } = Astro.props;
+const { id, label, type = "text", value = "" } = Astro.props;
 ---
 
-<div class="relative w-full my-6">
-  <input
-    id={id}
-    type={type}
-    value={value}
-    placeholder=""
-    class="peer block w-full border-b-2 border-text-primary focus:border-accent-primary bg-transparent px-2 pt-4 pb-1  text-lg text-text-primary outline-none"
+<style>
+.input-group {
+  position: relative;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+.input-group input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--text-primary, #333);
+  background: transparent;
+  padding: 1rem 0.5rem 0.5rem;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.input-group label {
+  position: absolute;
+  left: 0.5rem;
+  top: 1rem;
+  font-size: 1.125rem;
+  color: var(--text-primary, #333);
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -0.4rem;
+  font-size: 0.875rem;
+  color: var(--accent-primary, #0077ff);
+}
+</style>
+
+<div class="input-group">
+  <input 
+    id={id} 
+    type={type} 
+    value={value} 
+    placeholder=" "  
   />
-  <label
-    for={id}
-    class="absolute left-0 top-2 text-text-primary text-lg transition-all duration-200 ease-in-out
-           peer-placeholder-shown:top-5 
-           peer-placeholder-shown:text-base
-           peer-placeholder-shown:text-text-primary
-           peer-focus:-top-3
-           peer-focus:text-text-primary
-           peer-focus:text-sm
-           peer-not-placeholder-shown:-top-2
-           peer-not-placeholder-shown:text-sm"
-           
-  >
-    {label}
-  </label>
+  <label for={id}>{label}</label>
 </div>
