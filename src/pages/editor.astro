@@ -11,7 +11,8 @@ const url = Astro.url.searchParams.get("id");
 const { data: userData, error: userError } = await supabase.auth.getUser();
 const userId = userData.user?.id;
 let title: string = '';
-let desc : string = ''
+let desc : string = '';
+let thumb : string| null = null;
 
 if (!userId) {
   return Astro.redirect("/");
@@ -36,6 +37,7 @@ if (!url) {
   const {data,error} = await supabase.from('draft').select('*').eq('id', url)
   title = data && data.length > 0 ? data[0].title : '';
   desc = data && data.length > 0 ? data[0].desc : '';
+  thumb = data && data.length > 0 ? data[0].thumb : null;
 }
 ---
 
@@ -45,7 +47,7 @@ if (!url) {
     <p class="text-sm text-text-secondary p-2">
       This is the editor page where you can create and edit content.
     </p>
-    <ThumbnailUploader client:only/>
+    <ThumbnailUploader client:only initialUrl={thumb} />
     <div>
     <FloatingInput id="title" label="Title" type="text" value={title ? title : ''} />
 

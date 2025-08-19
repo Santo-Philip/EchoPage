@@ -1,6 +1,5 @@
 import type { DraftContent } from "./saveToDatabase";
 import saveToDatabase from "./saveToDatabase";
-import saveToLocal from "./saveToLocal";
 
 let saveTimeout: ReturnType<typeof setTimeout>;
 

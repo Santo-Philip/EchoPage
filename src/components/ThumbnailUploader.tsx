@@ -1,58 +1,65 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { X, Upload } from "lucide-react";
+import { compressImage } from "@/lib/compress";
+import { getSearchParam } from "@/lib/blogs/getParams";
+import autoSave from "@/lib/blogs/autosave";
+import saveToDatabase from "@/lib/blogs/saveToDatabase";
 
 interface ThumbnailUploaderProps {
-  onUploadComplete?: (url: string) => void;
-  maxSizeMB?: number;
-  width?: number;
-  height?: number;
-  quality?: number;
+  initialUrl?: string | null;
 }
 
-export default function ThumbnailUploader({
-  onUploadComplete,
-  maxSizeMB = 5,
-  width = 1280,
-  height = 720,
-  quality = 0.8,
-}: ThumbnailUploaderProps) {
+export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const compressImage = (file: File): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      if (file.type === "image/gif") return resolve(file);
+  const MAX_SIZE_MB = 2;
 
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject("Canvas error");
+  useEffect(() => {
+    setPreview(initialUrl || null);
+  }, [initialUrl]);
 
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) return reject("Compression failed");
-            resolve(blob);
-          },
-          "image/jpeg",
-          quality
-        );
-      };
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
+  const uploadFileToApi = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/crud/files/upload", {
+      method: "POST",
+      body: formData,
     });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || "Upload failed");
+    }
+    const data = await response.json();
+    const id = getSearchParam('id')
+    autoSave(id, { thumb : data.url })
+    return data.url as string;
+  };
+
+  const deleteFileFromApi = async (url: string): Promise<void> => {
+    const res = await fetch("/api/crud/files/remove", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    if (!res.ok){
+      window.showToast('Something went wrong')
+    } else { 
+      saveToDatabase(getSearchParam('id'), { thumb: '' })
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      setError(`File exceeds ${maxSizeMB}MB`);
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setError(`File exceeds ${MAX_SIZE_MB}MB`);
       return;
     }
 
@@ -61,123 +68,88 @@ export default function ThumbnailUploader({
     setProgress(0);
 
     try {
-      const processedFile = await compressImage(file);
-      const previewUrl = URL.createObjectURL(processedFile);
-      setPreview(previewUrl);
-
-      // Simulate upload
-      const fakeUpload = new Promise<string>((resolve) => {
-        const interval = setInterval(() => {
-          setProgress((prev) => {
-            if (prev >= 100) {
-              clearInterval(interval);
-              resolve("https://example.com/uploaded-thumbnail.jpg");
-            }
-            return prev + 10;
-          });
-        }, 100);
-      });
-
-      const uploadedUrl = await fakeUpload;
-      setUploading(false);
+      setProgress(20);
+      const compressedFile = await compressImage(file);
+      setProgress(60);
+      const uploadedUrl = await uploadFileToApi(compressedFile);
       setProgress(100);
-      onUploadComplete?.(uploadedUrl);
+      setPreview(uploadedUrl);
+      setTimeout(() => setUploading(false), 500);
     } catch (err) {
-      console.error(err);
       setUploading(false);
-      setError("Failed to process image");
+      setError((err as Error).message || "Failed to process/upload image");
     }
   };
 
-  const handleReplaceClick = () => {
-    // Reset to allow selecting a new file
+  const handleReplaceClick = async () => {
+    if (preview) {
+      try {
+        await deleteFileFromApi(preview);
+      } catch (err) {
+        console.error("Error deleting old file:", err);
+      }
+    }
     setPreview(null);
     setProgress(0);
     setUploading(false);
     setError("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
-    <div style={{ maxWidth: "500px", margin: "0 auto", fontFamily: "sans-serif" }}>
+    <div className="max-w-md mx-auto font-sans">
       {!preview && (
         <label
           htmlFor="thumbnail-upload"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "2px dashed #0077ff",
-            borderRadius: "12px",
-            padding: "40px",
-            cursor: "pointer",
-            transition: "background 0.2s, border-color 0.2s",
-            textAlign: "center",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#f0f8ff";
-            e.currentTarget.style.borderColor = "#005fcc";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-            e.currentTarget.style.borderColor = "#0077ff";
-          }}
+          className="flex flex-col items-center justify-center border-2 border-dashed border-blue-500 rounded-xl p-8 cursor-pointer text-center transition-all hover:bg-blue-50 hover:border-blue-600"
         >
           <input
             id="thumbnail-upload"
             type="file"
             accept="image/png, image/jpeg, image/webp, image/gif"
-            style={{ display: "none" }}
+            className="hidden"
             onChange={handleFileChange}
+            ref={fileInputRef}
           />
-          <span style={{ fontSize: "18px", fontWeight: "bold", color: "#0077ff" }}>
-            Upload Thumbnail
-          </span>
-          <span style={{ fontSize: "14px", color: "#555", marginTop: "8px" }}>
-            JPG, PNG, GIF, WEBP (max {maxSizeMB}MB)
+          <Upload className="w-10 h-10 text-blue-500 mb-2" />
+          <span className="text-lg font-semibold text-blue-500">Upload Thumbnail</span>
+          <span className="text-sm text-gray-500 mt-2">
+            JPG, PNG, GIF, WEBP (max {MAX_SIZE_MB}MB)
           </span>
         </label>
       )}
 
-      {error && <p style={{ color: "red", marginTop: "8px" }}>{error}</p>}
+      {error && (
+        <p className="text-red-500 text-sm mt-2 animate-pulse">{error}</p>
+      )}
+
+      {uploading && (
+        <div className="mt-3 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-500 transition-all duration-300 ease-in-out"
+            style={{ width: `${progress}%` }}
+          >
+            <div className="h-full bg-blue-300 animate-pulse" />
+          </div>
+        </div>
+      )}
 
       {preview && (
-        <div style={{ marginTop: "16px", position: "relative", cursor: "pointer" }} onClick={handleReplaceClick}>
+        <div className="mt-4 relative group">
           <img
             src={preview}
-            alt="Preview"
-            style={{ width: "100%", borderRadius: "8px", objectFit: "cover" }}
+            alt="Uploaded Thumbnail"
+            className="w-full aspect-video rounded-lg object-cover shadow-md"
           />
-          {uploading && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                height: "6px",
-                width: `${progress}%`,
-                backgroundColor: "#0077ff",
-                borderRadius: "0 8px 0 0",
-                transition: "width 0.1s linear",
-              }}
-            />
-          )}
-          {!uploading && (
-            <div
-              style={{
-                position: "absolute",
-                top: "8px",
-                right: "8px",
-                backgroundColor: "rgba(0,0,0,0.6)",
-                color: "#fff",
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontSize: "12px",
-              }}
-            >
-              Click to replace
-            </div>
-          )}
+          <button
+            onClick={handleReplaceClick}
+            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"
+            title="Replace Image"
+          >
+            <X className="w-8 h-8 text-white" />
+          </button>
         </div>
       )}
     </div>

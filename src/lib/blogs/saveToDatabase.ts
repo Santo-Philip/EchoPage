@@ -3,7 +3,7 @@ export interface DraftContent {
   title?: string;
   value?: string;
   desc?: string;
-  img?: string;
+  thumb?: string;
   content?: string;
   slug?: string;
   lang?: string;
