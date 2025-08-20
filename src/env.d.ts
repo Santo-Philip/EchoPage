@@ -3,6 +3,8 @@ interface ImportMetaEnv {
   readonly SUPABASE_ANON_KEY: string
   readonly NAME : string
   readonly EMAIL : string
+  readonly AI_API : string
+  readonly AI_API_KEY : string
 }
 
 interface ImportMeta {

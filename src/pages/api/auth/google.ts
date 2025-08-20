@@ -8,11 +8,9 @@ export const GET: APIRoute = async ({ cookies, redirect, request }) => {
     provider: 'google',
     options: {
       redirectTo: `${origin}/api/auth/callback`,
-      queryParams: { prompt: 'select_account' },
     },
     
   })
-console.log(data)
   if (error) throw error
 
   return redirect(data.url) 

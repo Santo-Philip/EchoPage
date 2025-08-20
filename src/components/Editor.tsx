@@ -13,6 +13,7 @@ import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
+import Image from '@tiptap/extension-image'
 
 interface Props {
   savedContent?: any; 
@@ -20,6 +21,7 @@ interface Props {
 
 const EditorPage: React.FC<Props> = ({ savedContent}) => {
   const [show, setShow] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
   const [coords, setCoords] = useState({
     top: 0,
     bottom: 0,
@@ -29,15 +31,27 @@ const EditorPage: React.FC<Props> = ({ savedContent}) => {
   const [slashRange, setSlashRange] = useState({ from: 0, to: 0 });
 
   const editor = useEditor({
-      onUpdate: ({ editor }) => {
+    onUpdate: ({ editor }) => {
     const id = getSearchParam('id')
     const json = editor.getJSON()
     const html = editor.getHTML()
     autoSave(id,{content_json:JSON.stringify(json),content_html:html})
+  const text = editor.getText();          
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  setWordCount(wordCount);
+  },
+  onFocus: () => {
+  const text = editor.getText();          
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  setWordCount(wordCount);
   },
     autofocus: true,
     content: savedContent ? savedContent : '',
     extensions: [
+      Image.configure({
+        allowBase64 :true,
+        inline : true
+      }),
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
       }),
@@ -89,6 +103,7 @@ const EditorPage: React.FC<Props> = ({ savedContent}) => {
   return (
     <div className="editor-page  mx-auto">
       <EditorContent editor={editor} />
+      <p className="p-2 font-bold text-text-muted">Total Words : {wordCount}</p>
       <SlashMenu
         show={show}
         coords={coords}

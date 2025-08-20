@@ -32,9 +32,9 @@ export default function Toasts() {
 
   return (
     <>
-      <div className="toast-container">
+      <div className="toast-container min-w-screen-lg">
         {toasts.map((t) => (
-          <div id={`toast-${t.id}`} key={t.id} className="toast">
+          <div id={`toast-${t.id}`} key={t.id} className="toast ">
             {t.message}
           </div>
         ))}
@@ -43,9 +43,14 @@ export default function Toasts() {
       <style>
         {`
           .toast-container {
+           margin-left: auto;
+           margin-right: auto;
+            width: 100%;
+            max-width: 600px;
             position: fixed;
-            bottom: 16px;
-            right: 16px;
+            top: 60px;
+            left: 0;
+            right: 0;
             display: flex;
             flex-direction: column;
             gap: 8px;

@@ -71,6 +71,7 @@ if (!url) {
   <script>
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
+import { slugify } from "@/lib/blogs/slug";
 
     const title = document.getElementById('title') as HTMLInputElement;
     const desc = document.getElementById('desc') as HTMLTextAreaElement;
@@ -78,7 +79,7 @@ import { getSearchParam } from "@/lib/blogs/getParams";
 
     title.addEventListener('input',() =>{
       const id = getSearchParam('id')
-      autoSave(id, { title : title.value });
+      autoSave(id, { title : title.value,slug : slugify(title.value) });
     })
 
     desc.addEventListener('input',() =>{

@@ -2,6 +2,10 @@ import React from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import type { Editor } from "@tiptap/core";
+import { compressImage } from "@/lib/compress";
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
+import saveToDatabase from "@/lib/blogs/saveToDatabase";
 
 interface SlashMenuProps {
   show: boolean;
@@ -16,6 +20,37 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
   editor,
   range,
 }) => {
+  const uploadFileToApi = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/crud/files/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || "Upload failed");
+    }
+    const data = await response.json();
+    const id = getSearchParam("id");
+    autoSave(id, { thumb: data.url });
+    return data.url as string;
+  };
+
+  const deleteFileFromApi = async (url: string): Promise<void> => {
+    const res = await fetch("/api/crud/files/remove", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    if (!res.ok) {
+      window.showToast("Something went wrong");
+    } else {
+      saveToDatabase(getSearchParam("id"), { thumb: "" });
+    }
+  };
   if (!show) return null;
   const items = [
     {
@@ -283,6 +318,98 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       title: "Bold",
       onSelect: () => {
         editor?.chain().focus().toggleBold().run();
+      },
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          className="lucide lucide-bold-icon lucide-bold"
+        >
+          <path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />
+        </svg>
+      ),
+      title: "YouTube",
+      onSelect: () => {
+        const url = window.prompt("Gib your link here...");
+        if (url) {
+          editor?.chain().focus().setYoutubeVideo({src : url}).run();
+        }
+      },
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          className="lucide lucide-image-icon lucide-image"
+        >
+          <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+          <circle cx="9" cy="9" r="2" />
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+        </svg>
+      ),
+      title: "Image",
+      onSelect: async () => {
+        const [fileHandle] = await (window as any).showOpenFilePicker({
+          types: [
+            {
+              description: "Images",
+              accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"] },
+            },
+          ],
+          multiple: false,
+        });
+        const file = await fileHandle.getFile();
+        const compressedFile = await compressImage(file);
+        const url = await uploadFileToApi(compressedFile);
+
+        if (url) {
+          editor?.chain().focus().setImage({ src: url }).run();
+        }
+      },
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          className="lucide lucide-image-play-icon lucide-image-play"
+        >
+          <path d="M15 15.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z" />
+          <path d="M21 12.17V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" />
+          <path d="m6 21 5-5" />
+          <circle cx="9" cy="9" r="2" />
+        </svg>
+      ),
+      title: "Imagelink",
+      onSelect: () => {
+        const url = window.prompt("Gib your link here...");
+        if (url) {
+          editor?.chain().focus().setImage({ src: url }).run();
+        }
       },
     },
   ];

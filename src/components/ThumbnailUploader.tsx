@@ -145,7 +145,7 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
           />
           <button
             onClick={handleReplaceClick}
-            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg"
+            className="absolute flex top-0 right-0 cursor-pointer items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 rounded-full p-2"
             title="Replace Image"
           >
             <X className="w-8 h-8 text-white" />

@@ -30,7 +30,7 @@ async function saveToDatabase(blogId: string, data: DraftContent) {
       
     }
 
-    window.showToast('Success')
+    // window.showToast('Success')
   } catch (err) {
     console.error("Failed to save to Supabase:", err);
     window.showToast('Something went wrong')

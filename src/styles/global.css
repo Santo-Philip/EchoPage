@@ -152,3 +152,15 @@ font-weight: 700;
   justify-content: center;
 }
 
+.ProseMirror img{
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  max-width: 100%;
+}
+
+.ProseMirror iframe {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+}
