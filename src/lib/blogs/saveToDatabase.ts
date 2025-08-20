@@ -4,11 +4,14 @@ export interface DraftContent {
   value?: string;
   desc?: string;
   thumb?: string;
-  content?: string;
+  content_json?: string;
+  content_html? : string;
   slug?: string;
   lang?: string;
   status?: string;
   updated_at?: string;
+  tags?: string[];
+  category?: string;
 }
 
 async function saveToDatabase(blogId: string, data: DraftContent) {

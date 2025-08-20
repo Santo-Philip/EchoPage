@@ -1,9 +1,6 @@
 import Compressor from "compressorjs";
 
 export interface CompressOptions {
-  quality?: number;
-  maxWidth?: number;
-  maxHeight?: number;
   convertSize?: number;
 }
 
@@ -18,9 +15,9 @@ export function compressImage(
     }
 
     new Compressor(file, {
-      quality: options.quality ?? 0.4,
-      maxWidth: options.maxWidth ?? 1280,
-      maxHeight: options.maxHeight ?? 720, 
+      quality:  0.4,
+      maxWidth:  1280,
+      maxHeight:  720, 
       convertSize: options.convertSize ?? 2_000_000,
       success(result: Blob) {
         const compressedFile = new File([result], file.name, {

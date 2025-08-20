@@ -11,8 +11,14 @@ import Youtube from "@tiptap/extension-youtube";
 import TextAlign from "@tiptap/extension-text-align";
 import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
 
-const EditorPage: React.FC = () => {
+interface Props {
+  savedContent?: any; 
+}
+
+const EditorPage: React.FC<Props> = ({ savedContent}) => {
   const [show, setShow] = useState(false);
   const [coords, setCoords] = useState({
     top: 0,
@@ -23,6 +29,14 @@ const EditorPage: React.FC = () => {
   const [slashRange, setSlashRange] = useState({ from: 0, to: 0 });
 
   const editor = useEditor({
+      onUpdate: ({ editor }) => {
+    const id = getSearchParam('id')
+    const json = editor.getJSON()
+    const html = editor.getHTML()
+    autoSave(id,{content_json:JSON.stringify(json),content_html:html})
+  },
+    autofocus: true,
+    content: savedContent ? savedContent : '',
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },

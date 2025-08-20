@@ -3,7 +3,7 @@ import FloatingInput from "../components/FloatingInput.astro";
 import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
-import EditorTab from "../components/Editor.js";
+import EditorPage from "../components/Editor.js";
 import { supabase } from "@/lib/supabase";
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 
@@ -13,6 +13,8 @@ const userId = userData.user?.id;
 let title: string = '';
 let desc : string = '';
 let thumb : string| null = null;
+let content : JSON | null = null;
+
 
 if (!userId) {
   return Astro.redirect("/");
@@ -38,6 +40,7 @@ if (!url) {
   title = data && data.length > 0 ? data[0].title : '';
   desc = data && data.length > 0 ? data[0].desc : '';
   thumb = data && data.length > 0 ? data[0].thumb : null;
+  content = data && data.length > 0 ? JSON.parse(data[0].content_json) : null;
 }
 ---
 
@@ -54,7 +57,7 @@ if (!url) {
     <FloatingTextArea id="desc" label="Description" rows="4" value={desc ? desc : ''}/>
     </div>
 
-    <EditorTab client:only />
+    <EditorPage client:only savedContent={content} />
     <div class="flex justify-end">
       <button
       id="smtbtn"
