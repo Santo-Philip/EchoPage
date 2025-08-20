@@ -23,10 +23,13 @@ export const SlashCommand = Extension.create({
             onStart: (props) => {
               this.options.setRange?.(props.range);
               this.options.setShow?.(true);
+              document.documentElement.style.overflowY = "hidden";
+
             },
             onExit: () => {
               this.options.setShow?.(false);
               this.editor?.chain().focus().run();
+              document.documentElement.style.overflowY = "auto";
             },
             onKeyDown: ({ event }) => {
               if (event.key === "Escape") {

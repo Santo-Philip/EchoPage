@@ -6,6 +6,7 @@ import { compressImage } from "@/lib/compress";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
 import saveToDatabase from "@/lib/blogs/saveToDatabase";
+import aiClient from "@/lib/aiClient";
 
 interface SlashMenuProps {
   show: boolean;
@@ -48,11 +49,62 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
     if (!res.ok) {
       window.showToast("Something went wrong");
     } else {
-      saveToDatabase(getSearchParam("id"), { thumb: "" });
+      window.showToast("File deleted successfully");
     }
   };
   if (!show) return null;
   const items = [
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="none"
+          viewBox="0 0 16 16"
+        >
+          <path stroke="currentColor" d="M8 1.5H3.5a1 1 0 0 0-1 1v11" />
+          <path stroke="currentColor" d="M14 14.5H3.5a1 1 0 1 1 0-2h10V8" />
+          <path
+            fill="currentColor"
+            d="m11.5.5.99 2.51L15 4l-2.51.99-.99 2.51-.99-2.51L8 4l2.51-.99L11.5.5ZM7.5 5l.707 1.793L10 7.5l-1.793.707L7.5 10l-.707-1.793L5 7.5l1.793-.707L7.5 5Z"
+          />
+        </svg>
+      ),
+      title: "AI Complete",
+      onSelect: async () => {
+        let buffer = "";
+
+try {
+  for await (const token of await aiClient({
+    prompt: `Complete this : ${editor?.getText()}`,
+    system:
+      "Output ONLY valid Tiptap JSON nodes. Use heading nodes for titles, paragraph for text, and include bold, italic, links, or code where appropriate. Do NOT include raw text or explanations.",
+  })) {
+    if (!token) continue;
+    buffer += token;
+
+    try {
+      const parsed = JSON.parse(buffer);
+      if (Array.isArray(parsed.content)) {
+        parsed.content.forEach((node: any) => {
+          editor?.commands.insertContent(node);
+        });
+      } else {
+        editor?.commands.insertContent(parsed);
+      }
+      buffer = "";
+    } catch {
+
+      continue;
+    }
+  }
+} catch (err) {
+  console.error("Error during AI streaming insert:", err);
+}
+
+      },
+    },
     {
       icon: (
         <svg
@@ -341,7 +393,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       onSelect: () => {
         const url = window.prompt("Gib your link here...");
         if (url) {
-          editor?.chain().focus().setYoutubeVideo({src : url}).run();
+          editor?.chain().focus().setYoutubeVideo({ src: url }).run();
         }
       },
     },
@@ -424,23 +476,6 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       }
       render={() => (
         <div className="bg-text-secondary border border-text-muted text-bg-primary rounded  shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
-          <button className="flex gap-2 justify-center bg-bg-primary text-text-primary items-center p-2 hover:bg-bg-primary/70 w-full">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 16 16"
-            >
-              <path stroke="currentColor" d="M8 1.5H3.5a1 1 0 0 0-1 1v11" />
-              <path stroke="currentColor" d="M14 14.5H3.5a1 1 0 1 1 0-2h10V8" />
-              <path
-                fill="currentColor"
-                d="m11.5.5.99 2.51L15 4l-2.51.99-.99 2.51-.99-2.51L8 4l2.51-.99L11.5.5ZM7.5 5l.707 1.793L10 7.5l-1.793.707L7.5 10l-.707-1.793L5 7.5l1.793-.707L7.5 5Z"
-              />
-            </svg>
-            <p>Auto Complete</p>
-          </button>
           {items.map((item, i) => (
             <button
               key={i}
