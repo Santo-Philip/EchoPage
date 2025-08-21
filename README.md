@@ -24,7 +24,7 @@ A modern, open-source blogging platform built with **Astro**, **Supabase**, **Ti
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/astro-supabase-blog.git
+git clone https://github.com/Santo-Philip/EchoPage.git
 cd astro-supabase-blog
 ```
 
@@ -39,9 +39,14 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
-OPENAI_API_KEY=your-openai-api-key
+add new image in public folder and rename it as logo to change current logo everywhere
+
+SUPABASE_URL=get_from-supabase
+SUPABASE_ANON_KEY=get_from-supabase
+NAME="EchoPage" change as you like 
+EMAIL=example@demo.com # Add more email with a , seperated
+PUBLIC_AI_API=get_from-openai
+PUBLIC_AI_API_KEY=get_from-openai
 ```
 
 ### 4. Run Development Server
