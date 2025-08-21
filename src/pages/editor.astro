@@ -1,6 +1,4 @@
 ---
-import FloatingInput from "../components/FloatingInput.astro";
-import FloatingTextArea from "../components/FloatingTextArea.astro";
 import Layout from "../layouts/Layout.astro";
 import { Loader } from "@lucide/astro";
 import EditorPage from "../components/Editor.js";
@@ -62,23 +60,4 @@ if (!url) {
       </button>
     </div>
   </div>
-  <script>
-import autoSave from "@/lib/blogs/autosave";
-import { getSearchParam } from "@/lib/blogs/getParams";
-import { slugify } from "@/lib/blogs/slug";
-
-    const title = document.getElementById('title') as HTMLInputElement;
-    const desc = document.getElementById('desc') as HTMLTextAreaElement;
-    const btn = document.getElementById('smtbtn') as HTMLButtonElement;
-
-    title.addEventListener('input',() =>{
-      const id = getSearchParam('id')
-      autoSave(id, { title : title.value,slug : slugify(title.value) });
-    })
-
-    desc.addEventListener('input',() =>{
-      const id = getSearchParam('id')
-      autoSave(id, { desc : desc.value });
-    })
-</script>
 </Layout>

@@ -5,7 +5,6 @@ import type { Editor } from "@tiptap/core";
 import { compressImage } from "@/lib/compress";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
-import saveToDatabase from "@/lib/blogs/saveToDatabase";
 import aiClient from "@/lib/aiClient";
 
 interface SlashMenuProps {
@@ -53,6 +52,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
     }
   };
   if (!show) return null;
+  
   const items = [
     {
       icon: (
