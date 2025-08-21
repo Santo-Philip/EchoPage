@@ -13,13 +13,15 @@ import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
-import Image from '@tiptap/extension-image'
+import Image from "@tiptap/extension-image";
+import extractTitleAndDescription from "@/lib/blogs/titleDescExtract";
+import { slugify } from "@/lib/blogs/slug";
 
 interface Props {
-  savedContent?: any; 
+  savedContent?: any;
 }
 
-const EditorPage: React.FC<Props> = ({ savedContent}) => {
+const EditorPage: React.FC<Props> = ({ savedContent }) => {
   const [show, setShow] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [coords, setCoords] = useState({
@@ -32,25 +34,32 @@ const EditorPage: React.FC<Props> = ({ savedContent}) => {
 
   const editor = useEditor({
     onUpdate: ({ editor }) => {
-    const id = getSearchParam('id')
-    const json = editor.getJSON()
-    const html = editor.getHTML()
-    autoSave(id,{content_json:JSON.stringify(json),content_html:html})
-  const text = editor.getText();          
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
-  setWordCount(wordCount);
-  },
-  onFocus: () => {
-  const text = editor.getText();          
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
-  setWordCount(wordCount);
-  },
+      const id = getSearchParam("id");
+      const json = editor.getJSON();
+      const html = editor.getHTML();
+      const ext = extractTitleAndDescription(json);
+      autoSave(id, {
+        content_json: JSON.stringify(json),
+        content_html: html,
+        title: ext.title,
+        desc: ext.description,
+        slug : slugify(ext.title)
+      });
+      const text = editor.getText();
+      const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+      setWordCount(wordCount);
+    },
+    onFocus: () => {
+      const text = editor.getText();
+      const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+      setWordCount(wordCount);
+    },
     autofocus: true,
-    content: savedContent ? savedContent : '',
+    content: savedContent ? savedContent : "",
     extensions: [
       Image.configure({
-        allowBase64 :true,
-        inline : true
+        allowBase64: true,
+        inline: true,
       }),
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },

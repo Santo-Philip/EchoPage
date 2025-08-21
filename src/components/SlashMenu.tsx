@@ -75,34 +75,32 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       onSelect: async () => {
         let buffer = "";
 
-try {
-  for await (const token of await aiClient({
-    prompt: `Complete this : ${editor?.getText()}`,
-    system:
-      "Output ONLY valid Tiptap JSON nodes. Use heading nodes for titles, paragraph for text, and include bold, italic, links, or code where appropriate. Do NOT include raw text or explanations.",
-  })) {
-    if (!token) continue;
-    buffer += token;
+        try {
+          for await (const token of await aiClient({
+            prompt: `Complete this : ${editor?.getText()}`,
+            system:
+              "Output ONLY valid Tiptap JSON nodes.Atleast 500 words. Use heading nodes for titles, paragraph for text, and include bold, italic,strike, underline, links, or code and quote,text alignment center ,right , left and list where appropriate. Do NOT include raw text or explanations.",
+          })) {
+            if (!token) continue;
+            buffer += token;
 
-    try {
-      const parsed = JSON.parse(buffer);
-      if (Array.isArray(parsed.content)) {
-        parsed.content.forEach((node: any) => {
-          editor?.commands.insertContent(node);
-        });
-      } else {
-        editor?.commands.insertContent(parsed);
-      }
-      buffer = "";
-    } catch {
-
-      continue;
-    }
-  }
-} catch (err) {
-  console.error("Error during AI streaming insert:", err);
-}
-
+            try {
+              const parsed = JSON.parse(buffer);
+              if (Array.isArray(parsed.content)) {
+                parsed.content.forEach((node: any) => {
+                  editor?.commands.insertContent(node);
+                });
+              } else {
+                editor?.commands.insertContent(parsed);
+              }
+              buffer = "";
+            } catch {
+              continue;
+            }
+          }
+        } catch (err) {
+          console.error("Error during AI streaming insert:", err);
+        }
       },
     },
     {

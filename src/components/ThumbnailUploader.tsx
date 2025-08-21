@@ -99,7 +99,7 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
   };
 
   return (
-    <div className="max-w-md mx-auto font-sans">
+    <div className="max-w-2xl mx-auto font-sans">
       {!preview && (
         <label
           htmlFor="thumbnail-upload"
@@ -145,7 +145,7 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
           />
           <button
             onClick={handleReplaceClick}
-            className="absolute flex top-0 right-0 cursor-pointer items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 rounded-full p-2"
+            className="absolute flex top-0 right-0 cursor-pointer items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 rounded-full"
             title="Replace Image"
           >
             <X className="w-8 h-8 text-white" />

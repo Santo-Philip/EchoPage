@@ -51,12 +51,6 @@ if (!url) {
       This is the editor page where you can create and edit content.
     </p>
     <ThumbnailUploader client:only initialUrl={thumb} />
-    <div>
-    <FloatingInput id="title" label="Title" type="text" value={title ? title : ''} />
-
-    <FloatingTextArea id="desc" label="Description" rows="4" value={desc ? desc : ''}/>
-    </div>
-
     <EditorPage client:only savedContent={content} />
     <div class="flex justify-end">
       <button
@@ -69,7 +63,6 @@ if (!url) {
     </div>
   </div>
   <script>
-import aiClient from "@/lib/aiClient";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
 import { slugify } from "@/lib/blogs/slug";
