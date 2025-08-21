@@ -58,7 +58,7 @@ function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
 }
 
 export async function deleteFileFromApi(url: string): Promise<void> {
-  await fetch('/api/crud/files/delete', {
+  await fetch('/api/crud/files/remove', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),

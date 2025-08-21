@@ -6,7 +6,10 @@ interface AiClientOptions {
   maxTokens?: number;
 }
 
-export default async function aiClient(options: AiClientOptions, onToken?: (token: string) => void): Promise<string> {
+export default async function aiClient(
+  options: AiClientOptions,
+  onToken?: (token: string) => void
+): Promise<string> {
   const ai = import.meta.env.PUBLIC_AI_API;
   const key = import.meta.env.PUBLIC_AI_API_KEY;
 
@@ -55,10 +58,8 @@ export default async function aiClient(options: AiClientOptions, onToken?: (toke
 
     buffer += decoder.decode(value, { stream: true });
 
-    // split by lines (SSE sends events line by line)
     const lines = buffer.split("\n");
 
-    // keep the last unfinished line in buffer
     buffer = lines.pop() || "";
 
     for (const line of lines) {
@@ -73,7 +74,7 @@ export default async function aiClient(options: AiClientOptions, onToken?: (toke
         const delta = parsed.choices?.[0]?.delta?.content;
         if (delta) {
           result += delta;
-          if (onToken) onToken(delta); // send token to caller for live streaming
+          if (onToken) onToken(delta);
         }
       } catch (err) {
         console.warn("Failed to parse stream line:", data, err);

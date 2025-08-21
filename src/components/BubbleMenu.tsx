@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 interface BubbleMenuProps {
   editor: Editor;
-
 }
 
 export function BubbleMenu({ editor }: BubbleMenuProps) {
