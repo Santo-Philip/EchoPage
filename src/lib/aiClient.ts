@@ -4,6 +4,7 @@ interface AiClientOptions {
   system?: string;
   temperature?: number;
   maxTokens?: number;
+  stream?: boolean; // Made optional, defaults to false
 }
 
 export default async function aiClient(
@@ -27,7 +28,7 @@ export default async function aiClient(
     temperature: options.temperature ?? 1,
     max_tokens: options.maxTokens ?? 5000,
     top_p: 1,
-    stream: true,
+    stream: options.stream ?? false, // Default to false (non-streamed)
   };
 
   const res = await fetch(ai, {
@@ -43,6 +44,17 @@ export default async function aiClient(
     throw new Error(`Request failed: ${res.status} ${res.statusText}`);
   }
 
+  if (!options.stream) {
+    // Non-streamed response
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error("No content in non-streamed response");
+    }
+    return content;
+  }
+
+  // Streamed response
   if (!res.body) {
     throw new Error("No response body received for streaming");
   }
@@ -59,7 +71,6 @@ export default async function aiClient(
     buffer += decoder.decode(value, { stream: true });
 
     const lines = buffer.split("\n");
-
     buffer = lines.pop() || "";
 
     for (const line of lines) {

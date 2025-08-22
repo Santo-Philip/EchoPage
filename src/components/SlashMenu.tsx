@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import type { Editor } from "@tiptap/core";
 import { compressImage } from "@/lib/compress";
-import autoSave from "@/lib/blogs/autosave";
-import { getSearchParam } from "@/lib/blogs/getParams";
 import aiClient from "@/lib/aiClient";
 import uploadFileToApi from "@/lib/blogs/uploadFile";
+import getLastTextNode from "@/lib/blogs/getLastText";
 
 interface SlashMenuProps {
   show: boolean;
@@ -15,28 +14,21 @@ interface SlashMenuProps {
   range: { from: number; to: number };
 }
 
+interface TipTapJSONNode {
+  type: string;
+  attrs?: Record<string, unknown>;
+  content?: TipTapJSONNode[];
+  text?: string;
+}
+
 export const SlashMenu: React.FC<SlashMenuProps> = ({
   show,
   coords,
   editor,
   range,
 }) => {
- 
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const deleteFileFromApi = async (url: string): Promise<void> => {
-    const res = await fetch("/api/crud/files/remove", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    });
-    if (!res.ok) {
-      window.showToast("Something went wrong");
-    } else {
-      window.showToast("File deleted successfully");
-    }
-  };
-  if (!show) return null;
-  
   const items = [
     {
       icon: (
@@ -57,36 +49,63 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       ),
       title: "AI Complete",
       onSelect: async () => {
-        let buffer = "";
-
         try {
-          for await (const token of await aiClient({
-            prompt: `Complete this : ${editor?.getText()}`,
-            system:
-              "Output ONLY valid Tiptap JSON nodes.Atleast 500 words. Use heading nodes for titles, paragraph for text, and include bold, italic,strike, underline, links, or code and quote,text alignment center ,right , left and list where appropriate. Do NOT include raw text or explanations.",
-          })) {
-            if (!token) continue;
-            buffer += token;
+          const lastText = getLastTextNode(editor?.getJSON());
+          console.log(lastText);
+          if (!lastText) {
+            window.showToast(
+              "No text add some text or heading to start AI completion"
+            );
+            return;
+          }
+          const prompt = `Continue writing the blog from this point:\n\n${lastText.text}`;
 
-            try {
-              const parsed = JSON.parse(buffer);
-              if (Array.isArray(parsed.content)) {
-                parsed.content.forEach((node: any) => {
-                  editor?.commands.insertContent(node);
-                });
-              } else {
-                editor?.commands.insertContent(parsed);
-              }
-              buffer = "";
-            } catch {
-              continue;
-            }
+          const system = `
+You are an AI that outputs **only valid TipTap JSON nodes**.
+- The last node in the editor is a "${lastText.type}".
+- If the last node is a heading, generate a paragraph next.
+- If the last node is a paragraph, generate either:
+  - A heading (level 2 or 3) for the next section, or
+  - Continue with a paragraph naturally following the previous text.
+- Do NOT generate multiple nested headings or extra paragraphs unnecessarily.
+- Include minimal formatting only when necessary: bold, italic, links, or code.
+- Do NOT include images, videos, or any unrelated content.
+- Output JSON must be directly insertable into TipTap without errors.
+- Generate roughly 300 words continuation.
+- Do NOT include explanations, comments, or raw text outside nodes.
+`;
+
+          const result = await aiClient({
+            stream: false,
+            prompt,
+            system,
+          });
+          let parsed: TipTapJSONNode | { content: TipTapJSONNode[] };
+          try {
+            parsed = JSON.parse(result);
+          } catch (err) {
+            window.showToast(
+              "Error : AI Doesnt bring a proper data try again. (It can happen sometime)"
+            );
+            return;
+          }
+          if ("content" in parsed && Array.isArray(parsed.content)) {
+            parsed.content.forEach((node) =>
+              editor?.commands.insertContent(node)
+            );
+          } else {
+            editor?.commands.insertContent(parsed as TipTapJSONNode);
           }
         } catch (err) {
-          console.error("Error during AI streaming insert:", err);
+          console.log(err);
+          window.showToast("AI Writing Failed");
+        } finally {
+          // Hide loading UI
+          // showLoading(false);
         }
       },
     },
+
     {
       icon: (
         <svg
@@ -96,9 +115,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-heading1-icon lucide-heading-1"
         >
           <path d="M4 12h8" />
@@ -121,9 +140,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-heading2-icon lucide-heading-2"
         >
           <path d="M4 12h8" />
@@ -146,9 +165,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-heading3-icon lucide-heading-3"
         >
           <path d="M4 12h8" />
@@ -172,9 +191,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-type-icon lucide-type"
         >
           <path d="M12 4v16" />
@@ -199,6 +218,31 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          className="lucide lucide-split-icon lucide-split"
+        >
+          <path d="M16 3h5v5" />
+          <path d="M8 3H3v5" />
+          <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3" />
+          <path d="m15 9 6-6" />
+        </svg>
+      ),
+      title: "Break",
+      onSelect: () => {
+        editor?.chain().focus().setHardBreak().run();
+      },
+    },
+    {
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-align-center-icon lucide-align-center"
         >
           <path d="M17 12H7" />
@@ -220,9 +264,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-align-left-icon lucide-align-left"
         >
           <path d="M15 12H3" />
@@ -244,9 +288,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-align-right-icon lucide-align-right"
         >
           <path d="M21 12H9" />
@@ -268,9 +312,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-quote-icon lucide-quote"
         >
           <path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" />
@@ -291,9 +335,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-code-icon lucide-code"
         >
           <path d="m16 18 6-6-6-6" />
@@ -314,9 +358,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-list-icon lucide-list"
         >
           <path d="M3 12h.01" />
@@ -341,9 +385,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-bold-icon lucide-bold"
         >
           <path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />
@@ -363,9 +407,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-bold-icon lucide-bold"
         >
           <path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />
@@ -388,9 +432,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-image-icon lucide-image"
         >
           <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
@@ -412,7 +456,6 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
         const file = await fileHandle.getFile();
         const compressedFile = await compressImage(file);
         const url = await uploadFileToApi(compressedFile);
-
         if (url) {
           editor?.chain().focus().setImage({ src: url }).run();
         }
@@ -427,9 +470,9 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-image-play-icon lucide-image-play"
         >
           <path d="M15 15.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997a1 1 0 0 1-1.517-.86z" />
@@ -447,6 +490,32 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       },
     },
   ];
+
+  useEffect(() => {
+    if (!show || !editor) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % items.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        editor.chain().deleteRange(range).focus().run();
+        items[activeIndex].onSelect();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [show, editor, activeIndex, range, items]);
+
+  if (!show) return null;
+
   return (
     <Tippy
       visible={show}
@@ -457,7 +526,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
         new DOMRect(coords.left, coords.bottom, 0, 0)
       }
       render={() => (
-        <div className="bg-text-secondary border border-text-muted text-bg-primary rounded  shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
+        <div className="bg-text-secondary border border-text-muted text-bg-primary rounded shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
           {items.map((item, i) => (
             <button
               key={i}
@@ -466,7 +535,12 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
                 editor?.chain().deleteRange(range).focus().run();
                 item.onSelect();
               }}
-              className="w-full flex gap-2 text-left px-2 py-1 hover:bg-text-primary/40 cursor-pointer"
+              onMouseEnter={() => setActiveIndex(i)}
+              className={`w-full flex gap-2 text-left px-2 py-1 cursor-pointer ${
+                i === activeIndex
+                  ? "bg-text-primary/40"
+                  : "hover:bg-text-primary/40"
+              }`}
             >
               {item.icon} {item.title}
             </button>
@@ -476,3 +550,5 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
     />
   );
 };
+
+export default SlashMenu;

@@ -15,6 +15,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tippyjs/react": "^4.2.6",
     "@tiptap/core": "^3.1.0",
+    "@tiptap/extension-hard-break": "^3.2.1",
     "@tiptap/extension-highlight": "^3.2.0",
     "@tiptap/extension-image": "^3.2.0",
     "@tiptap/extension-link": "^3.2.0",

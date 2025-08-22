@@ -2,7 +2,7 @@ import uploadFileToApi from "@/lib/blogs/uploadFile";
 import { compressImage } from "@/lib/compress";
 import type { Editor } from "@tiptap/core";
 import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/react/menus";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface BubbleMenuProps {
   editor: Editor;
@@ -15,28 +15,6 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
       className="bg-bg-secondary flex overflow-x-hidden border border-text-muted shadow-md rounded-md p-1"
       editor={editor}
     >
-      <button
-        onClick={() => {
-          console.log("Ask AI triggered");
-        }}
-        className="flex gap-1 items-center px-2 py-1 bg-bg-primary rounded-md hover:bg-bg-secondary/30 text-sm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="14"
-          height="14"
-          fill="none"
-          viewBox="0 0 16 16"
-        >
-          <path stroke="currentColor" d="M8 1.5H3.5a1 1 0 0 0-1 1v11" />
-          <path stroke="currentColor" d="M14 14.5H3.5a1 1 0 1 1 0-2h10V8" />
-          <path
-            fill="currentColor"
-            d="m11.5.5.99 2.51L15 4l-2.51.99-.99 2.51-.99-2.51L8 4l2.51-.99L11.5.5ZM7.5 5l.707 1.793L10 7.5l-1.793.707L7.5 10l-.707-1.793L5 7.5l1.793-.707L7.5 5Z"
-          />
-        </svg>
-        Ask AI
-      </button>
       <div className="relative">
         <button
           onClick={() => setShowMenu(!showMenu)}
@@ -61,26 +39,46 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
         </button>
         {showMenu && (
           <ul className=" top-full left-0 mt-1 w-40 h-60 overflow-y-auto bg-bg-primary border border-text-muted text-text-primary shadow-md rounded-md py-1 z-10">
-            <li
-              onClick={() =>
-                editor.chain().focus().setHeading({ level: 1 }).run
-              }
+                      <li
+              onClick={() => {
+                editor?.chain().focus().setHeading({ level: 1 }).run();
+              }}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("heading1") ? "bg-yellow-100 " : ""
+                editor.isActive("heading1") ? "text-text-muted " : ""
               }`}
             >
               Heading 1
-            </li>
-            <li
-              onClick={() =>
-                editor.chain().focus().setHeading({ level: 2 }).run
-              }
+            </li> 
+                                  <li
+              onClick={() => {
+                editor?.chain().focus().setHeading({ level: 2 }).run();
+              }}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+                editor.isActive("heading2") ? "text-text-muted " : ""
               }`}
             >
               Heading 2
-            </li>
+            </li> 
+                                  <li
+              onClick={() => {
+                editor?.chain().focus().setParagraph().run();
+              }}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("paragrpah") ? "text-text-muted " : ""
+              }`}
+            >
+              Text
+            </li> 
+                      <li
+              onClick={() => {
+                editor?.chain().focus().toggleBlockquote().run();
+              }}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("paragrpah") ? "text-text-muted " : ""
+              }`}
+            >
+              Quote
+            </li> 
             <li
               onClick={() => {
                 const link = window.prompt("Enter a URL:");
@@ -89,7 +87,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
                 }
               }}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+                editor.isActive("heading2") ? "text-text-muted " : ""
               }`}
             >
               URL Image
@@ -115,7 +113,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
                 }
               }}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+                editor.isActive("heading2") ? "text-text-muted " : ""
               }`}
             >
               Image
@@ -123,7 +121,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             <li
               onClick={() => editor.chain().focus().toggleBold().run()}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("bold") ? "font-bold bg-gray-50" : ""
+                editor.isActive("bold") ? "font-bold bg-text-muted/50" : ""
               }`}
             >
               Bold
@@ -131,7 +129,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             <li
               onClick={() => editor.chain().focus().toggleItalic().run()}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("italic") ? "italic bg-gray-50" : ""
+                editor.isActive("italic") ? "italic bg-text-muted/50" : ""
               }`}
             >
               Italic
@@ -139,7 +137,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             <li
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("underline") ? "underline bg-gray-50" : ""
+                editor.isActive("underline") ? "underline bg-text-muted/50" : ""
               }`}
             >
               Underline
@@ -147,7 +145,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             <li
               onClick={() => editor.chain().focus().toggleStrike().run()}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
-                editor.isActive("strike") ? "line-through bg-gray-50" : ""
+                editor.isActive("strike") ? "line-through bg-text-muted/50" : ""
               }`}
             >
               Strikethrough
@@ -156,7 +154,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               onClick={() => editor.chain().focus().toggleSuperscript().run()}
               className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
                 editor.isActive("superscript")
-                  ? "text-xs align-super bg-gray-50"
+                  ? "text-xs align-super bg-text-muted/50"
                   : ""
               }`}
             >
@@ -222,7 +220,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
                 editor.isActive("list") ? "text-text-muted/50" : ""
               }`}
             >
-              Task List
+              List
             </li>
           </ul>
         )}

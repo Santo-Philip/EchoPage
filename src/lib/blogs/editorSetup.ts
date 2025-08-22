@@ -8,6 +8,7 @@ import Highlight from '@tiptap/extension-highlight';
 import { Placeholder } from '@tiptap/extensions';
 import { SlashCommand } from '@/lib/slashCommand';
 import { CaretPosition } from '@/lib/caretCoordination';
+import HardBreak from '@tiptap/extension-hard-break';
 
 interface EditorConfigProps {
   setShow: (visible: boolean | ((prev: boolean) => boolean)) => void;
@@ -22,8 +23,10 @@ export function getEditorConfig({ setShow, setRange, setCoords }: EditorConfigPr
         allowBase64: true,
         inline: true,
       }),
+      HardBreak,
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        hardBreak : false
       }),
       Highlight.configure({ multicolor: true }),
       Superscript,

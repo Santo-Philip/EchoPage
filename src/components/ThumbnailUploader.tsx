@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Upload } from "lucide-react";
 import { compressImage } from "@/lib/compress";
 import { getSearchParam } from "@/lib/blogs/getParams";
 import autoSave from "@/lib/blogs/autosave";
@@ -103,7 +102,7 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
       {!preview && (
         <label
           htmlFor="thumbnail-upload"
-          className="flex flex-col items-center justify-center border-2 border-dashed border-blue-500 rounded-xl p-8 cursor-pointer text-center transition-all hover:bg-blue-50 hover:border-blue-600"
+          className="flex flex-col items-center justify-center border-2 border-dashed border-blue-500 rounded-xl p-8 cursor-pointer text-center transition-all hover:bg-blue-700/40 hover:border-blue-600"
         >
           <input
             id="thumbnail-upload"
@@ -113,7 +112,7 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
             onChange={handleFileChange}
             ref={fileInputRef}
           />
-          <Upload className="w-10 h-10 text-blue-500 mb-2" />
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-upload-icon lucide-upload"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
           <span className="text-lg font-semibold text-blue-500">Upload Thumbnail</span>
           <span className="text-sm text-gray-500 mt-2">
             JPG, PNG, GIF, WEBP (max {MAX_SIZE_MB}MB)
@@ -145,10 +144,10 @@ export default function ThumbnailUploader({ initialUrl }: ThumbnailUploaderProps
           />
           <button
             onClick={handleReplaceClick}
-            className="absolute flex top-0 right-0 cursor-pointer items-center justify-center bg-black bg-opacity-50 transition-opacity duration-200 rounded-full"
+            className="absolute flex top-0 right-0 cursor-pointer items-center justify-center text-white bg-black bg-opacity-50 transition-opacity duration-200 rounded-full"
             title="Replace Image"
           >
-            <X className="w-8 h-8 text-white" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
       )}
