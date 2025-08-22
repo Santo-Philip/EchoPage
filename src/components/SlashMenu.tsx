@@ -50,8 +50,8 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       title: "AI Complete",
       onSelect: async () => {
         try {
+          window.showLoading(true, false)
           const lastText = getLastTextNode(editor?.getJSON());
-          console.log(lastText);
           if (!lastText) {
             window.showToast(
               "No text add some text or heading to start AI completion"
@@ -65,7 +65,7 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
 - The last node in the editor is a "${lastText.type}".
 - If the last node is a heading, generate a paragraph next.
 - If the last node is a paragraph, generate either:
-  - A heading (level 2 or 3) for the next section, or
+  - A heading (level 2 ) for the next section, or
   - Continue with a paragraph naturally following the previous text.
 - Do NOT generate multiple nested headings or extra paragraphs unnecessarily.
 - Include minimal formatting only when necessary: bold, italic, links, or code.
@@ -74,7 +74,6 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
 - Generate roughly 300 words continuation.
 - Do NOT include explanations, comments, or raw text outside nodes.
 `;
-
           const result = await aiClient({
             stream: false,
             prompt,
@@ -100,8 +99,7 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
           console.log(err);
           window.showToast("AI Writing Failed");
         } finally {
-          // Hide loading UI
-          // showLoading(false);
+          window.showLoading(false)
         }
       },
     },

@@ -2,71 +2,134 @@
 import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
 
+
 const { data, error } = await supabase.auth.getUser();
+if (error || !data.user?.id) {
+  return Astro.redirect("/");
+}
 
 const user = {
   name: data.user?.user_metadata.full_name,
   email: data.user?.email,
+  id: data.user?.id,
 };
 
-if (error || !data.user.id) {
-    return Astro.redirect('/')
-}
+
+const PAGE_SIZE = 12;
+const page = Number(Astro.url.searchParams.get("page") || 1);
+const from = (page - 1) * PAGE_SIZE;
+const to = from + PAGE_SIZE - 1;
+
+const { data: blogData, error: blogError, count } = await supabase
+  .from("draft")
+  .select("*", { count: "exact" })
+  .eq("author", user.id)
+  .order("created_at", { ascending: false })
+  .range(from, to);
+
+const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
 ---
 
-<Layout title="Dashboard " desc="Welcome to your dashboard">
-  <section class="max-w-screen-md mx-auto p-2">
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-    >
+<Layout title="Dashboard" desc="Welcome to your dashboard">
+  <section class="max-w-screen-lg mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">
-          Welcome back, {user.name} 👋
-        </h1>
-        <p class="text-gray-600">
-          Manage your posts and account settings here.
-        </p>
+        <h1 class="text-3xl font-bold text-gray-900">Welcome back, {user.name} 👋</h1>
+        <p class="text-gray-600">Manage your posts and account settings here.</p>
       </div>
       <form action="api/auth/signout" method="get">
-      <button
-        class="bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl"
-      >
-        Logout
-      </button>
+        <button class="bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl shadow">
+          Logout
+        </button>
       </form>
     </div>
 
     <!-- Stats Section -->
-    <div class="flex gap-4 mt-8">
-      <div class="bg-white shadow w-full rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700">Posts</h2>
-        <p class="text-2xl font-bold text-gray-900 mt-2">12</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
+      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
+        <h2 class="text-sm font-semibold text-gray-500">Posts</h2>
+        <p class="text-3xl font-bold text-gray-900 mt-2">12</p>
       </div>
-      <div class="bg-white w-full shadow rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700">Drafts</h2>
-        <p class="text-2xl font-bold text-gray-900 mt-2">3</p>
+      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
+        <h2 class="text-sm font-semibold text-gray-500">Drafts</h2>
+        <p class="text-3xl font-bold text-gray-900 mt-2">{count ?? 0}</p>
       </div>
-      <div class="bg-white w-full shadow rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700">Views</h2>
-        <p class="text-2xl font-bold text-gray-900 mt-2">4.2k</p>
+      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
+        <h2 class="text-sm font-semibold text-gray-500">Views</h2>
+        <p class="text-3xl font-bold text-gray-900 mt-2">4.2k</p>
       </div>
-      <div class="bg-white w-full shadow rounded-2xl p-6">
-        <h2 class="text-lg font-semibold text-gray-700">Followers</h2>
-        <p class="text-2xl font-bold text-gray-900 mt-2">512</p>
+      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
+        <h2 class="text-sm font-semibold text-gray-500">Followers</h2>
+        <p class="text-3xl font-bold text-gray-900 mt-2">512</p>
       </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="mt-12">
-      <h2 class="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-      <div class="p-2 flex justify-center gap-6">
-        <a
-          href="/editor"
-          class="bg-blue-500 hover:bg-blue-600 text-white font-medium p-6 rounded-2xl text-center"
-        >
-          ✍️ Write New Post
-        </a>
-      </div>
+    <div class="mt-12 text-center">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+      <a
+        href="/editor"
+        class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-8 py-4 rounded-2xl text-lg shadow transition"
+      >
+        ✍️ Write New Post
+      </a>
+    </div>
+
+    <!-- Drafts Section -->
+    <div class="mt-16">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Your Drafts</h2>
+
+      {blogData && blogData.length > 0 ? (
+        <div class="gap-2 grid-cols-1 grid  md:grid-cols-2">
+          {blogData.map((blog) => (
+            <div class="bg-bg-secondary p-5 rounded-xl shadow hover:shadow-md transition">
+              {
+                blog.thumb ? (   
+              <img src={blog.thumb} alt="thumbnail" class="aspect-video rounded-2xl object-cover"/>
+                ) : (
+                  <div></div>
+                )
+              }
+              <h3 class="text-lg font-semibold text-text-primary">{blog.title ?? "Untitled Draft"}</h3>
+              <p class="text-te text-text-secondary mt-1">{blog.desc ?? "No description"}</p>
+              <div class="flex justify-between items-center mt-3">
+                <span class="text-xs text-gray-400">
+                  {new Date(blog.created_at).toLocaleDateString()}
+                </span>
+                <a
+                  href={`/manage?id=${blog.id}`}
+                  class="text-blue-500 hover:underline text-sm"
+                >
+                  Manage →
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="text-gray-500">You don’t have any drafts yet.</p>
+      )}
+
+      <!-- Pagination -->
+      {totalPages > 1 && (
+        <div class="flex justify-center gap-3 mt-8">
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const pageNum = i + 1;
+            return (
+              <a
+                href={`?page=${pageNum}`}
+                class={`px-4 py-2 rounded-lg border ${
+                  pageNum === page
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {pageNum}
+              </a>
+            );
+          })}
+        </div>
+      )}
     </div>
   </section>
 </Layout>
