@@ -1,158 +1,232 @@
+import uploadFileToApi from "@/lib/blogs/uploadFile";
+import { compressImage } from "@/lib/compress";
+import type { Editor } from "@tiptap/core";
 import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/react/menus";
-import { Editor } from "@tiptap/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface BubbleMenuProps {
   editor: Editor;
 }
 
 export function BubbleMenu({ editor }: BubbleMenuProps) {
+  const [showMenu, setShowMenu] = useState(false);
   return (
     <TiptapBubbleMenu
-      className="bg-bg-secondary flex flex-wrap overflow-x-hidden border border-text-muted shadow-2xl rounded-full p-[2px]"
+      className="bg-bg-secondary flex overflow-x-hidden border border-text-muted shadow-md rounded-md p-1"
       editor={editor}
     >
-      <button>
-        <div className="flex gap-2 justify-center items-center p-2 bg-bg-primary div-2 rounded-full shadow-2x border-accent border">
+      <button
+        onClick={() => {
+          console.log("Ask AI triggered");
+        }}
+        className="flex gap-1 items-center px-2 py-1 bg-bg-primary rounded-md hover:bg-bg-secondary/30 text-sm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          fill="none"
+          viewBox="0 0 16 16"
+        >
+          <path stroke="currentColor" d="M8 1.5H3.5a1 1 0 0 0-1 1v11" />
+          <path stroke="currentColor" d="M14 14.5H3.5a1 1 0 1 1 0-2h10V8" />
+          <path
+            fill="currentColor"
+            d="m11.5.5.99 2.51L15 4l-2.51.99-.99 2.51-.99-2.51L8 4l2.51-.99L11.5.5ZM7.5 5l.707 1.793L10 7.5l-1.793.707L7.5 10l-.707-1.793L5 7.5l1.793-.707L7.5 5Z"
+          />
+        </svg>
+        Ask AI
+      </button>
+      <div className="relative">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="flex gap-1 items-center px-2 py-1 bg-bg-primary rounded-md hover:bg-bg-secondary/30 text-sm"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             fill="none"
-            viewBox="0 0 16 16"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
           >
-            <path stroke="currentColor" d="M8 1.5H3.5a1 1 0 0 0-1 1v11" />
-            <path stroke="currentColor" d="M14 14.5H3.5a1 1 0 1 1 0-2h10V8" />
             <path
-              fill="currentColor"
-              d="m11.5.5.99 2.51L15 4l-2.51.99-.99 2.51-.99-2.51L8 4l2.51-.99L11.5.5ZM7.5 5l.707 1.793L10 7.5l-1.793.707L7.5 10l-.707-1.793L5 7.5l1.793-.707L7.5 5Z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
             />
           </svg>
-          <p>Explain</p>
-        </div>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`${editor.isActive('bold') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-bold-icon lucide-bold"
-        >
-          <path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />
-        </svg>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`${editor.isActive('underline') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-underline-icon lucide-underline"
-        >
-          <path d="M6 4v6a6 6 0 0 0 12 0V4" />
-          <line x1="4" x2="20" y1="20" y2="20" />
-        </svg>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`${editor.isActive('italic') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-italic-icon lucide-italic"
-        >
-          <line x1="19" x2="10" y1="4" y2="4" />
-          <line x1="14" x2="5" y1="20" y2="20" />
-          <line x1="15" x2="9" y1="4" y2="20" />
-        </svg>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`${editor.isActive('strike') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-strikethrough-icon lucide-strikethrough"
-        >
-          <path d="M16 4H9a3 3 0 0 0-2.83 4" />
-          <path d="M14 12a4 4 0 0 1 0 8H6" />
-          <line x1="4" x2="20" y1="12" y2="12" />
-        </svg>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleSuperscript().run()}
-        className={`${editor.isActive('superscript') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-superscript-icon lucide-superscript"
-        >
-          <path d="m4 19 8-8" />
-          <path d="m12 19-8-8" />
-          <path d="M20 12h-4c0-1.5.442-2 1.5-2.5S20 8.334 20 7.002c0-.472-.17-.93-.484-1.29a2.105 2.105 0 0 0-2.617-.436c-.42.239-.738.614-.899 1.06" />
-        </svg>
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-        className={`${editor.isActive('highlight') ? 'bg-text-primary text-bg-primary' : ''} px-4 py-2 rounded-full`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="lucide lucide-highlighter-icon lucide-highlighter"
-        >
-          <path d="m9 11-6 6v3h9l3-3" />
-          <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4" />
-        </svg>
-      </button>
+          Menu
+        </button>
+        {showMenu && (
+          <ul className=" top-full left-0 mt-1 w-40 h-60 overflow-y-auto bg-bg-primary border border-text-muted text-text-primary shadow-md rounded-md py-1 z-10">
+            <li
+              onClick={() =>
+                editor.chain().focus().setHeading({ level: 1 }).run
+              }
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("heading1") ? "bg-yellow-100 " : ""
+              }`}
+            >
+              Heading 1
+            </li>
+            <li
+              onClick={() =>
+                editor.chain().focus().setHeading({ level: 2 }).run
+              }
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+              }`}
+            >
+              Heading 2
+            </li>
+            <li
+              onClick={() => {
+                const link = window.prompt("Enter a URL:");
+                if (link) {
+                  editor.chain().focus().setImage({ src: link }).run();
+                }
+              }}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+              }`}
+            >
+              URL Image
+            </li>
+            <li
+              onClick={async () => {
+                const [fileHandle] = await (window as any).showOpenFilePicker({
+                  types: [
+                    {
+                      description: "Images",
+                      accept: {
+                        "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+                      },
+                    },
+                  ],
+                  multiple: false,
+                });
+                const file = await fileHandle.getFile();
+                const compressedFile = await compressImage(file);
+                const url = await uploadFileToApi(compressedFile);
+                if (url) {
+                  editor.chain().focus().setImage({ src: url }).run();
+                }
+              }}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("heading2") ? "bg-yellow-100 " : ""
+              }`}
+            >
+              Image
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("bold") ? "font-bold bg-gray-50" : ""
+              }`}
+            >
+              Bold
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("italic") ? "italic bg-gray-50" : ""
+              }`}
+            >
+              Italic
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("underline") ? "underline bg-gray-50" : ""
+              }`}
+            >
+              Underline
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("strike") ? "line-through bg-gray-50" : ""
+              }`}
+            >
+              Strikethrough
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("superscript")
+                  ? "text-xs align-super bg-gray-50"
+                  : ""
+              }`}
+            >
+              Superscript
+            </li>
+            <li
+              onClick={() => editor.chain().focus().toggleHighlight().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("highlight") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Highlight
+            </li>
+            <li
+              onClick={() => {
+                const link = window.prompt("Enter a URL:");
+                if (link) {
+                  editor.chain().focus().setLink({ href: link }).run();
+                }
+              }}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("link") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Link
+            </li>
+            <li
+              onClick={() =>
+                editor.chain().focus().toggleTextAlign("center").run()
+              }
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("textalign") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Center
+            </li>
+
+            <li
+              onClick={() =>
+                editor.chain().focus().toggleTextAlign("left").run()
+              }
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("textalign") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Left
+            </li>
+
+            <li
+              onClick={() =>
+                editor.chain().focus().toggleTextAlign("right").run()
+              }
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("textalign") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Right
+            </li>
+
+            <li
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={`px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer ${
+                editor.isActive("list") ? "text-text-muted/50" : ""
+              }`}
+            >
+              Task List
+            </li>
+          </ul>
+        )}
+      </div>
     </TiptapBubbleMenu>
   );
 }

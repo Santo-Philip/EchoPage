@@ -6,6 +6,7 @@ import { compressImage } from "@/lib/compress";
 import autoSave from "@/lib/blogs/autosave";
 import { getSearchParam } from "@/lib/blogs/getParams";
 import aiClient from "@/lib/aiClient";
+import uploadFileToApi from "@/lib/blogs/uploadFile";
 
 interface SlashMenuProps {
   show: boolean;
@@ -20,24 +21,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
   editor,
   range,
 }) => {
-  const uploadFileToApi = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("/api/crud/files/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || "Upload failed");
-    }
-    const data = await response.json();
-    const id = getSearchParam("id");
-    autoSave(id, { thumb: data.url });
-    return data.url as string;
-  };
+ 
 
   const deleteFileFromApi = async (url: string): Promise<void> => {
     const res = await fetch("/api/crud/files/remove", {

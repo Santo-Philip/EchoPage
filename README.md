@@ -25,7 +25,7 @@ A modern, open-source blogging platform built with **Astro**, **Supabase**, **Ti
 
 ```bash
 git clone https://github.com/Santo-Philip/EchoPage.git
-cd astro-supabase-blog
+cd EchoPage
 ```
 
 ### 2. Install Dependencies

@@ -53,7 +53,7 @@ export default function EditorPage({ savedContent }: EditorPageProps) {
         <p className="text-red-500 text-sm mt-2 animate-pulse">{error}</p>
       )}
       <SlashMenu show={show} coords={coords} editor={editor} range={slashRange} />
-      <BubbleMenu editor={editor} />
+      <BubbleMenu  editor={editor} />
     </div>
   );
 }
