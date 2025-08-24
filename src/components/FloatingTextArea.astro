@@ -44,6 +44,7 @@ const { id, label, rows = 2, value = "", placeholder = " " } = Astro.props;
 <div class="textarea-group">
   <textarea 
     id={id} 
+    name={id}
     rows={rows} 
     placeholder=" "  
     maxlength="350"

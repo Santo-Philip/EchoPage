@@ -1,5 +1,6 @@
 ---
 import FloatingInput from "@/components/FloatingInput.astro";
+import SeoPreview from "@/components/searchPreview";
 
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
@@ -27,6 +28,8 @@ if (!data || data.length === 0) {
 if (userId !== data[0].author) {
   return Astro.redirect("/");
 }
+
+const domain = Astro.url.origin;
 ---
 
 <Layout
@@ -39,32 +42,111 @@ if (userId !== data[0].author) {
       From here you can manage and update your draft.
     </p>
     <ThumbnailUploader client:only initialUrl={data[0].thumb} />
-
+    <SeoPreview
+      domain={domain}
+      title={data[0].title || "Untitled"}
+      description={data[0].desc || "No description"}
+      slug={data[0].slug}
+      thumbnail={data[0].thumb}
+      client:load
+    />
     <div class="flex flex-col gap-4 mt-4">
       <div>
         <FloatingInput value={data[0].title} label="Title" id="title" />
       </div>
       <p class="text-accent-primary text-sm p-2">Description</p>
-      <div contenteditable="true" class="w-full min-h-12 outline-none border-b border-text-muted p-2">
+      <div
+        contenteditable="true"
+        id="desc"
+        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+      >
         {data[0].desc}
       </div>
-          <p class="text-accent-primary text-sm p-2">Tags</p>
-      <div contenteditable="true" class="w-full min-h-12 outline-none border-b border-text-muted p-2">
+      <p class="text-accent-primary text-sm p-2">Tags</p>
+      <div
+        id="tags"
+        contenteditable="true"
+        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+      >
         {data[0].tags}
       </div>
-          <p class="text-accent-primary text-sm p-2">Keywords</p>
-      <div contenteditable="true" class="w-full min-h-12 outline-none border-b border-text-muted p-2">
+      <p class="text-accent-primary text-sm p-2">Keywords</p>
+      <div
+        id="keywords"
+        contenteditable="true"
+        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+      >
         {data[0].keywords}
       </div>
-    <p class="text-accent-primary text-sm p-2">Category</p>
-      <div contenteditable="true" class="w-full min-h-12 outline-none border-b border-text-muted p-2">
+      <p class="text-accent-primary text-sm p-2">Category</p>
+      <div
+        id="category"
+        contenteditable="true"
+        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+      >
         {data[0].category}
       </div>
+    </div>
+    {
+      email === admin && (
+        <div class="flex w-full justify-end">
+          <button class="bg-accent-primary  hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl">
+            Publish
+          </button>
+        </div>
+      )
+    }
+    <div class="flex justify-end w-full">
+      <a
+        href=`/draft/${id}`
+        class="px-10 border m-2 border-accent-primary rounded-xl py-2"
+        >Save</a
+      >
+    </div>
+    <p class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500">
+Danger Zone
+    </p>
+    <div class="flex w-full mt-4 items-center justify-between">
+<p>Archive this page</p>
+<button class="px-12 py-2 bg-red-500 text-white rounded-xl">
+  Yes
+</button>
     </div>
   </div>
 </Layout>
 <script>
-    const title = document.getElementById('title') as HTMLInputElement;
-    const desc = document.getElementById('desc') as HTMLTextAreaElement;
-    
+  import autoSave from "@/lib/blogs/autosave";
+  import { getSearchParam } from "@/lib/blogs/getParams";
+
+  const title = document.getElementById("title") as HTMLInputElement;
+  const desc = document.getElementById("desc") as HTMLDivElement;
+  const tags = document.getElementById("tags") as HTMLDivElement;
+  const keywords = document.getElementById("keywords") as HTMLDivElement;
+  const category = document.getElementById("category") as HTMLDivElement;
+  const id = getSearchParam("id");
+
+  title.addEventListener("input", () => {
+    const text = title.value;
+    autoSave(id, { title: text });
+  });
+
+  desc.addEventListener("input", () => {
+    const text = desc.innerText;
+    autoSave(id, { desc: text });
+  });
+
+  tags.addEventListener("input", () => {
+    const text = tags.innerText;
+    autoSave(id, { tags: [text] });
+  });
+
+  keywords.addEventListener("input", () => {
+    const text = keywords.innerText;
+    autoSave(id, { keywords: [text] });
+  });
+
+  category.addEventListener("input", () => {
+    const text = category.innerText;
+    autoSave(id, { category: text });
+  });
 </script>

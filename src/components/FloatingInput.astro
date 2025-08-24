@@ -43,7 +43,8 @@ const { id, label, type = "text", value = "" } = Astro.props;
     id={id} 
     type={type} 
     value={value} 
-    placeholder=" "  
+    placeholder=" " 
+    name={id} 
   />
   <label for={id}>{label}</label>
 </div>

@@ -32,3 +32,23 @@ export const PATCH: APIRoute = async ({ request, params }) => {
     return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
   }
 };
+
+export const DELETE: APIRoute = async ({ params }) => {
+  const blogId = params.id; 
+  if (!blogId) {
+    return new Response(JSON.stringify({ error: "Blog ID missing" }), { status: 400 });
+  }
+
+  try {
+    const { error } = await supabase.from("draft").delete().eq("id", blogId )
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), { status: 500 })
+    
+    }
+    return new Response(JSON.stringify({ message: "Draft deleted successfully" }), {
+      status: 200,
+    })
+  } catch {
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 })
+  }
+}
