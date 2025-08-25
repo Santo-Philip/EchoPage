@@ -1,0 +1,45 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+// Get logged-in user
+const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+if (!user?.id) {
+  throw Astro.redirect('/');
+}
+
+// Fetch drafts for this user
+const { data, error } = await supabase
+  .from('draft')
+  .select('*')
+  .eq('author', user.id)
+  .eq('status', 'draft');
+
+if (error) {
+  console.error("Error fetching drafts:", error);
+}
+---
+
+<Layout title="Your Drafts" desc="Your drafts">
+  <div class="max-w-screen-md mx-auto p-4">
+    <h1 class="text-xl font-bold mb-2">Welcome to your drafts!</h1>
+    <p class="mb-4">Here are your drafts:</p>
+
+    {data && data.length > 0 && (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {data.map((draft) => (
+          <a href={`/draft/${draft.id}`} class="border-text-muted border rounded-2xl shadow-sm" id={draft.id}>
+            <img src={draft.thumb} alt={draft.title || 'Thumbnail'} class="aspect-video rounded-2xl object-cover"/>
+            <h2 class="font-medium p-2">{draft.title || "Untitled"}</h2>
+            <p class="text-text-secondary p-2">{draft.desc || "No description provided."}</p>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {(!data || data.length === 0) && (
+      <p class="text-gray-500">No drafts found.</p>
+    )}
+  </div>
+</Layout>
