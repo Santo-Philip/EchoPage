@@ -1,0 +1,57 @@
+---
+import { supabase } from "@/lib/supabase";
+
+
+const {data, error} = await supabase.from("categories").select("*");
+
+if (!data) {
+    return;
+}
+const categories = data.map((cat) => cat.title);
+
+const { selectedCategory = null } = Astro.props;
+---
+
+<div id="category-selector" class="flex flex-wrap gap-2">
+  {categories.map((cat) => {
+    const isSelected = selectedCategory === cat;
+    return (
+      <button
+        type="button"
+        class={`px-4 py-2 rounded-full border transition ${
+          isSelected
+            ? "bg-blue-600 text-white border-blue-600"
+            : "text-text-muted border-text-muted"
+        }`}
+        data-category={cat}
+      >
+        {cat}
+      </button>
+    );
+  })}
+</div>
+
+<script>
+  const container = document.getElementById("category-selector");
+  const buttons = container?.querySelectorAll("button");
+
+  let selected = null;
+
+  buttons?.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      buttons.forEach((b) =>
+        b.classList.remove("bg-blue-600", "text-white", "border-blue-600")
+      );
+      buttons.forEach((b) =>
+        b.classList.add("text-text-muted", "border-text-muted")
+      );
+      btn.classList.remove("text-text-muted", "border-text-muted");
+      btn.classList.add("bg-blue-600", "text-white", "border-blue-600");
+      selected = btn.dataset.category;
+      const event = new CustomEvent("categoryChange", {
+        detail: { category: selected },
+      });
+      document.dispatchEvent(event);
+    });
+  });
+</script>

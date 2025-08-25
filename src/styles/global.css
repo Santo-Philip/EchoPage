@@ -164,3 +164,18 @@ font-weight: 700;
   width: 100%;
   aspect-ratio: 9 / 16;
 }
+
+.suggestions {
+  border: var(--color-accent-hover) solid 1px;
+  background-color: var(--color-bg-secondary);
+  padding: 8px 20px 8px 20px;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: all 0.5s ease-in-out;
+  opacity: 60%;
+}
+.suggestions:hover {
+  background-color: var(--color-text-primary);
+  color: var(--color-bg-secondary);
+
+}

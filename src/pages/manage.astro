@@ -1,10 +1,12 @@
 ---
+import Category from "@/components/category.astro";
 import FloatingInput from "@/components/FloatingInput.astro";
 import SeoPreview from "@/components/searchPreview";
 
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
+
 
 const id = Astro.url.searchParams.get("id");
 const user = await supabase.auth.getUser();
@@ -49,16 +51,31 @@ const domain = Astro.url.origin;
       client:load
     />
     <div class="flex flex-col gap-4 mt-4">
-      <div>
-        <FloatingInput value={data[0].title} label="Title" id="title" />
+      <p class="text-accent-primary text-sm p-2">Title</p>
+      <div
+        contenteditable="true"
+        id="title"
+        class="w-full text-wrap min-h-12 outline-none border-b border-text-muted p-2"
+      >
+        {data[0].title}
+      </div>
+      <div
+        id="title-suggestions"
+        class="w-full justify-center items-center flex flex-wrap gap-4"
+      >
       </div>
       <p class="text-accent-primary text-sm p-2">Description</p>
       <div
         contenteditable="true"
         id="desc"
-        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+        class="w-full text-wrap min-h-12 outline-none border-b border-text-muted p-2"
       >
         {data[0].desc}
+      </div>
+      <div
+        id="descSuggestions"
+        class="w-full justify-center items-center flex flex-wrap gap-4"
+      >
       </div>
       <p class="text-accent-primary text-sm p-2">Tags</p>
       <div
@@ -68,6 +85,11 @@ const domain = Astro.url.origin;
       >
         {data[0].tags}
       </div>
+      <div
+        id="tags-suggestions"
+        class="w-full justify-center items-center flex flex-wrap gap-4"
+      >
+      </div>
       <p class="text-accent-primary text-sm p-2">Keywords</p>
       <div
         id="keywords"
@@ -76,16 +98,14 @@ const domain = Astro.url.origin;
       >
         {data[0].keywords}
       </div>
-      <p class="text-accent-primary text-sm p-2">Category</p>
       <div
-        id="category"
-        contenteditable="true"
-        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+        id="keyword-suggestions"
+        class="w-full justify-center items-center flex flex-wrap gap-4"
       >
-        {data[0].category}
       </div>
+      <p class="text-accent-primary text-sm p-2">Category</p>
     </div>
-
+    <Category selectedCategory={data[0].category} />
     <div class="flex justify-end w-full">
       <a
         href=`/draft/${id}`
@@ -101,60 +121,167 @@ const domain = Astro.url.origin;
     <div class="flex w-full mt-4 items-center justify-between">
       <p>Archive this page</p>
       <button
-     id='archivebtn'
-     data-id={data[0].status === "archived" ? 'unarchive' : "archive"}
-      class="px-10 border m-2 border-amber-500 cursor-pointer rounded-xl py-2"
+        id="archivebtn"
+        data-id={data[0].status === "archived" ? "unarchive" : "archive"}
+        class="px-10 border m-2 border-amber-500 cursor-pointer rounded-xl py-2"
       >
-        {data[0].status === "archived" ? 'Unarchive' : 'Archive'}
+        {data[0].status === "archived" ? "Unarchive" : "Archive"}
       </button>
     </div>
   </div>
+
+  <script>
+    import aiClient from "@/lib/aiClient";
+    import autoSave from "@/lib/blogs/autosave";
+    import { getSearchParam } from "@/lib/blogs/getParams";
+
+    const title = document.getElementById("title") as HTMLDivElement;
+    const desc = document.getElementById("desc") as HTMLDivElement;
+    const tags = document.getElementById("tags") as HTMLDivElement;
+    const keywords = document.getElementById("keywords") as HTMLDivElement;
+    const archive = document.getElementById("archivebtn") as HTMLButtonElement;
+    const titleSuggestions = document.getElementById(
+      "title-suggestions"
+    ) as HTMLDivElement;
+    const descSuggestions = document.getElementById(
+      "descSuggestions"
+    ) as HTMLDivElement;
+    const keywordSuggestions = document.getElementById(
+      "keyword-suggestions"
+    ) as HTMLDivElement;
+    const tagSuggestions = document.getElementById(
+      "tags-suggestions"
+    ) as HTMLDivElement;
+
+    const id = getSearchParam("id");
+
+    async function getSEOSuggestions(query: string, desc: string) {
+      try {
+        const ai = await aiClient({
+          system:
+            "You are an SEO assistant. Return only valid JSON. No explanations, no comments.",
+          prompt: `Generate at least 5 SEO-friendly suggestions for the following query: "${query}" and description: "${desc}".
+      
+Return ONLY in this JSON format:
+{
+  "titles": ["...", "...", "...", "...", "..."],
+  "descriptions": ["...", "...", "...", "...", "..."],
+  "tags": ["...", "...", "...", "...", "..."],
+  "keywords": ["...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...", "...","...", "...", "...", "...","..."]
+}
+
+Notes:
+- Titles and descriptions must be at least 5 items each.
+- Tags must be at least 5 items.
+- Keywords must be at least 15 items (mix of short-tail and long-tail).`,
+        });
+
+        return JSON.parse(ai);
+      } catch (error) {
+        window.showToast(`Failed to fetch SEO suggestions: ${error}`);
+        return null;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const query = title.innerText;
+      const description = desc.innerText;
+      const suggestions = await getSEOSuggestions(query, description);
+      if (!suggestions) return;
+      titleSuggestions.innerHTML = "";
+      descSuggestions.innerHTML = "";
+      keywordSuggestions.innerHTML = "";
+      tagSuggestions.innerHTML = "";
+      suggestions.titles.forEach((titletxt: string) => {
+        const button = document.createElement("button");
+        button.classList.add("suggestions");
+        button.innerText = titletxt;
+        titleSuggestions.appendChild(button);
+        button.addEventListener("click", () => {
+          title.innerText = titletxt;
+        });
+      });
+      suggestions.descriptions.forEach((description: string) => {
+        const button = document.createElement("button");
+        button.classList.add("suggestions");
+        button.innerText = description;
+        descSuggestions.appendChild(button);
+        button.addEventListener("click", () => {
+          autoSave(id, { desc: description });
+          desc.innerText = description;
+        });
+      });
+      suggestions.keywords.forEach((keyword: string) => {
+        const button = document.createElement("button");
+        button.classList.add("suggestions");
+        button.innerText = keyword;
+        keywordSuggestions.appendChild(button);
+        button.addEventListener("click", () => {
+          const word = keywords.innerText;
+          keywords.innerText = word + keyword + ",";
+        });
+      });
+      suggestions.tags.forEach((tag: string) => {
+        const button = document.createElement("button");
+        button.classList.add("suggestions");
+        button.innerText = tag;
+        tagSuggestions.appendChild(button);
+        button.addEventListener("click", () => {
+          const word = tags.innerText;
+          tags.innerText = word + tag + ",";
+        });
+      });
+    });
+
+    archive.addEventListener("click", () => {
+      const status = archive.getAttribute("data-id");
+      if (status === "archive") {
+        autoSave(id, { status: "archived" });
+      } else {
+        autoSave(id, { status: "draft" });
+      }
+      window.location.reload();
+    });
+
+    function watchAndSave(
+      element: HTMLDivElement,
+      fieldName: string,
+      asArray = false
+    ) {
+      function extractValue() {
+        let value: string | string[] = element.innerText.trim();
+        if (asArray) {
+          value = [
+            ...new Set(
+              value
+                .split(",") 
+                .map((v) => v.trim())
+                .filter(Boolean)
+            ),
+          ];
+        }
+
+        autoSave(id, { [fieldName]: value });
+      }
+      element.addEventListener("input", extractValue);
+      const observer = new MutationObserver(() => {
+        extractValue();
+      });
+
+      observer.observe(element, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
+
+    watchAndSave(title, "title");
+    watchAndSave(desc, "desc");
+    watchAndSave(keywords, "keywords", true);
+    watchAndSave(tags, "tags", true);
+
+   document.addEventListener("categoryChange", (e) => {
+    autoSave(id,{category : (e as CustomEvent).detail.category})
+  });
+  </script>
 </Layout>
-<script>
-  import autoSave from "@/lib/blogs/autosave";
-  import { getSearchParam } from "@/lib/blogs/getParams";
-
-  const title = document.getElementById("title") as HTMLInputElement;
-  const desc = document.getElementById("desc") as HTMLDivElement;
-  const tags = document.getElementById("tags") as HTMLDivElement;
-  const keywords = document.getElementById("keywords") as HTMLDivElement;
-  const category = document.getElementById("category") as HTMLDivElement;
-  const archive = document.getElementById("archivebtn") as HTMLButtonElement;
-
-  const id = getSearchParam("id");
-
-  title.addEventListener("input", () => {
-    const text = title.value;
-    autoSave(id, { title: text });
-  });
-
-  desc.addEventListener("input", () => {
-    const text = desc.innerText;
-    autoSave(id, { desc: text });
-  });
-
-  tags.addEventListener("input", () => {
-    const text = tags.innerText;
-    autoSave(id, { tags: [text] });
-  });
-
-  keywords.addEventListener("input", () => {
-    const text = keywords.innerText;
-    autoSave(id, { keywords: [text] });
-  });
-
-  category.addEventListener("input", () => {
-    const text = category.innerText;
-    autoSave(id, { category: text });
-  });
-archive.addEventListener("click", () => {
-  const status = archive.getAttribute("data-id");
-  if (status === "archive") {
-    autoSave(id, { status: "archived" });
-  } else {
-    autoSave(id, { status: "draft" });
-  }
-  window.location.reload();
-})
-
-</script>
