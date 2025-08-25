@@ -51,13 +51,13 @@ if (!url) {
     <ThumbnailUploader client:only initialUrl={thumb} />
     <EditorPage client:only savedContent={content} />
     <div class="flex justify-end">
-      <button
+      <a href={`/manage?id=${url}`}
       id="smtbtn"
         class="bg-accent-primary hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl"
       >
         <p>Submit</p>
         <p class="animate-spin hidden"><Loader /></p>
-      </button>
+      </a>
     </div>
   </div>
 </Layout>

@@ -9,8 +9,6 @@ import { supabase } from "@/lib/supabase";
 const id = Astro.url.searchParams.get("id");
 const user = await supabase.auth.getUser();
 const userId = user.data.user?.id;
-const admin = import.meta.env.EMAIL;
-const email = user.data.user?.email;
 
 if (!userId) {
   return Astro.redirect("/");
@@ -87,30 +85,28 @@ const domain = Astro.url.origin;
         {data[0].category}
       </div>
     </div>
-    {
-      email === admin && (
-        <div class="flex w-full justify-end">
-          <button class="bg-accent-primary  hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl">
-            Publish
-          </button>
-        </div>
-      )
-    }
+
     <div class="flex justify-end w-full">
       <a
         href=`/draft/${id}`
-        class="px-10 border m-2 border-accent-primary rounded-xl py-2"
-        >Save</a
+        class="px-10 border m-2 border-accent-primary rounded-xl py-2">Review</a
       >
     </div>
-    <p class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500">
-Danger Zone
+    <p
+      class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
+    >
+      Danger Zone
     </p>
+
     <div class="flex w-full mt-4 items-center justify-between">
-<p>Archive this page</p>
-<button class="px-12 py-2 bg-red-500 text-white rounded-xl">
-  Yes
-</button>
+      <p>Archive this page</p>
+      <button
+     id='archivebtn'
+     data-id={data[0].status === "archived" ? 'unarchive' : "archive"}
+      class="px-10 border m-2 border-amber-500 cursor-pointer rounded-xl py-2"
+      >
+        {data[0].status === "archived" ? 'Unarchive' : 'Archive'}
+      </button>
     </div>
   </div>
 </Layout>
@@ -123,6 +119,8 @@ Danger Zone
   const tags = document.getElementById("tags") as HTMLDivElement;
   const keywords = document.getElementById("keywords") as HTMLDivElement;
   const category = document.getElementById("category") as HTMLDivElement;
+  const archive = document.getElementById("archivebtn") as HTMLButtonElement;
+
   const id = getSearchParam("id");
 
   title.addEventListener("input", () => {
@@ -149,4 +147,14 @@ Danger Zone
     const text = category.innerText;
     autoSave(id, { category: text });
   });
+archive.addEventListener("click", () => {
+  const status = archive.getAttribute("data-id");
+  if (status === "archive") {
+    autoSave(id, { status: "archived" });
+  } else {
+    autoSave(id, { status: "draft" });
+  }
+  window.location.reload();
+})
+
 </script>
