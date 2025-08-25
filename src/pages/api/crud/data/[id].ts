@@ -52,6 +52,14 @@ export const PATCH: APIRoute = async ({ request, params }) => {
       status: 400,
     });
   }
+  if (
+    data.status === "publish" &&
+    !email.includes(user.data.user.email || "")
+  ) {
+    return new Response(JSON.stringify({ error: "Not Allowed to publish" }), {
+      status: 401,
+    });
+  }
 
   try {
     const { error } = await supabase
