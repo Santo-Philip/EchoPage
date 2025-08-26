@@ -1,12 +1,11 @@
-import { Editor } from '@tiptap/core';
-import { getSearchParam } from '@/lib/blogs/getParams';
-import autoSave from '@/lib/blogs/autosave';
-import extractTitleAndDescription from '@/lib/blogs/titleDescExtract';
-import { slugify } from '@/lib/blogs/slug';
+import { Editor } from "@tiptap/core";
+import { getSearchParam } from "@/lib/blogs/getParams";
+import autoSave from "@/lib/blogs/autosave";
+import extractTitleAndDescription from "@/lib/blogs/titleDescExtract";
 
 export function handleAutoSave(editor: Editor) {
-  const saveContent = () => {
-    const id = getSearchParam('id');
+  const saveContent = async () => {
+    const id = getSearchParam("id");
     const json = editor.getJSON();
     const html = editor.getHTML();
     const { title, description } = extractTitleAndDescription(json);
@@ -15,13 +14,12 @@ export function handleAutoSave(editor: Editor) {
       content_html: html,
       title,
       desc: description,
-      slug: slugify(title),
     });
   };
 
-  editor.on('update', saveContent);
+  editor.on("update", saveContent);
 
   return () => {
-    editor.off('update', saveContent);
+    editor.off("update", saveContent);
   };
 }

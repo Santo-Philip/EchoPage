@@ -15,7 +15,7 @@ const user = {
 };
 
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 6;
 const page = Number(Astro.url.searchParams.get("page") || 1);
 const from = (page - 1) * PAGE_SIZE;
 const to = from + PAGE_SIZE - 1;
@@ -24,7 +24,6 @@ const { data: blogData, error: blogError, count } = await supabase
   .from("draft")
   .select("*", { count: "exact" })
   .eq("author", user.id)
-  .eq("status","published")
   .order("created_at", { ascending: false })
   .range(from, to);
 
@@ -45,24 +44,6 @@ const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
       </form>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10">
-      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
-        <h2 class="text-sm font-semibold text-gray-500">Posts</h2>
-        <p class="text-3xl font-bold text-gray-900 mt-2">12</p>
-      </div>
-      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
-        <h2 class="text-sm font-semibold text-gray-500">Drafts</h2>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{count ?? 0}</p>
-      </div>
-      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
-        <h2 class="text-sm font-semibold text-gray-500">Views</h2>
-        <p class="text-3xl font-bold text-gray-900 mt-2">4.2k</p>
-      </div>
-      <div class="bg-white shadow rounded-2xl p-6 text-center hover:shadow-md transition">
-        <h2 class="text-sm font-semibold text-gray-500">Followers</h2>
-        <p class="text-3xl font-bold text-gray-900 mt-2">512</p>
-      </div>
-    </div>
 
     <div class="mt-12 text-center">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
@@ -73,8 +54,6 @@ const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
         ✍️ Write New Post
       </a>
     </div>
-
-    <!-- Drafts Section -->
     <div class="mt-16">
       <h2 class="text-xl font-bold text-gray-900 mb-4">Your Published Posts</h2>
 
@@ -89,8 +68,8 @@ const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
                   <div></div>
                 )
               }
-              <h3 class="text-lg font-semibold text-text-primary">{blog.title ?? "Untitled Draft"}</h3>
-              <p class="text-te text-text-secondary mt-1">{blog.desc ?? "No description"}</p>
+              <h3 class="text-lg font-semibold text-text-primary">{blog.title || "Untitled Draft"}</h3>
+              <p class="text-te text-text-secondary mt-1">{blog.desc || "No description"}</p>
               <div class="flex justify-between items-center mt-3">
                 <span class="text-xs text-gray-400">
                   {new Date(blog.created_at).toLocaleDateString()}

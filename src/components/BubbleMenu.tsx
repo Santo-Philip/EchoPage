@@ -1,45 +1,29 @@
+import aiClient from "@/lib/aiClient";
 import uploadFileToApi from "@/lib/blogs/uploadFile";
 import { compressImage } from "@/lib/compress";
 import type { Editor } from "@tiptap/core";
 import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/react/menus";
-import { useState } from "react";
 
 interface BubbleMenuProps {
   editor: Editor;
 }
 
+interface TipTapJSONNode {
+  type: string;
+  attrs?: Record<string, unknown>;
+  content?: TipTapJSONNode[];
+  text?: string;
+}
+
 export function BubbleMenu({ editor }: BubbleMenuProps) {
-  const [showMenu, setShowMenu] = useState(false);
   return (
     <TiptapBubbleMenu
       className="bg-bg-secondary flex overflow-x-hidden border border-text-muted shadow-md rounded-md p-1"
       editor={editor}
     >
       <div className="relative">
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="flex gap-1 items-center px-2 py-1 bg-bg-primary rounded-md hover:bg-bg-secondary/30 text-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-          Menu
-        </button>
-        {showMenu && (
           <ul className=" top-full left-0 mt-1 w-40 h-60 overflow-y-auto bg-bg-primary border border-text-muted text-text-primary shadow-md rounded-md py-1 z-10">
-                      <li
+            <li
               onClick={() => {
                 editor?.chain().focus().setHeading({ level: 1 }).run();
               }}
@@ -48,8 +32,8 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               }`}
             >
               Heading 1
-            </li> 
-                                  <li
+            </li>
+            <li
               onClick={() => {
                 editor?.chain().focus().setHeading({ level: 2 }).run();
               }}
@@ -58,8 +42,66 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               }`}
             >
               Heading 2
-            </li> 
-                                  <li
+            </li>
+            <li
+            className="px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer "
+              onClick={async () => {
+                window.showLoading(true);
+
+                const lang = window.prompt("Enter a language:");
+                if (!lang) {
+                  window.showLoading(false);
+                  return;
+                }
+                const { from, to } = editor.state.selection;
+                const selectedText = editor.state.doc.textBetween(
+                  from,
+                  to,
+                  " "
+                );
+
+                if (!selectedText) {
+                  window.showToast("No text selected!");
+                  window.showLoading(false);
+                  return;
+                }
+
+                try {
+                  const trnslt = await aiClient({
+                    system:
+                      "You are the best language translator for TipTap. Just return valid TipTap JSON, no explanations.",
+                    prompt: `Translate the following text into ${lang}: ${selectedText}`,
+                  });
+
+                  let parsed;
+                  try {
+                    parsed = JSON.parse(trnslt);
+                  } catch (err) {
+                    window.showToast(
+                      "Error: AI returned invalid JSON. Try again."
+                    );
+                    return;
+                  }
+                  if (
+                    parsed &&
+                    "content" in parsed &&
+                    Array.isArray(parsed.content)
+                  ) {
+                    editor.commands.insertContent(parsed.content);
+                  } else {
+                    editor.commands.insertContent(parsed);
+                  }
+                } catch (err) {
+                  console.error(err);
+                  window.showToast("Unexpected error while translating.");
+                } finally {
+                  window.showLoading(false);
+                }
+              }}
+            >
+              AI Translate
+            </li>
+            <li
               onClick={() => {
                 editor?.chain().focus().setParagraph().run();
               }}
@@ -68,8 +110,8 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               }`}
             >
               Text
-            </li> 
-                      <li
+            </li>
+            <li
               onClick={() => {
                 editor?.chain().focus().toggleBlockquote().run();
               }}
@@ -78,7 +120,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               }`}
             >
               Quote
-            </li> 
+            </li>
             <li
               onClick={() => {
                 const link = window.prompt("Enter a URL:");
@@ -223,7 +265,6 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
               List
             </li>
           </ul>
-        )}
       </div>
     </TiptapBubbleMenu>
   );

@@ -1,26 +1,75 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { Loader } from "@lucide/astro";
 import EditorPage from "../components/Editor.js";
 import { supabase } from "@/lib/supabase";
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 
-const url = Astro.url.searchParams.get("id");
+let id = Astro.url.searchParams.get("id");
+let tr = Astro.url.searchParams.get("tr");
+
 const { data: userData, error: userError } = await supabase.auth.getUser();
 const userId = userData.user?.id;
+
 let title: string = '';
-let desc : string = '';
-let thumb : string| null = null;
-let content : JSON | null = null;
-
-
+let desc: string = '';
+let thumb: string | null = null;
+let content: JSON | null = null;
 
 if (!userId) {
   return Astro.redirect("/");
 }
 
-if (!url) {
-  console.log(userId);
+if (id) {
+  const { data, error } = await supabase
+    .from("draft")
+    .select("*")
+    .eq("id", id)
+    .eq("author", userId);
+
+  if (error) {
+    Astro.redirect("/dashboard");
+  }
+
+  if (data && data.length > 0) {
+    title = data[0].title || '';
+    desc = data[0].desc || '';
+    thumb = data[0].thumb || null;
+    content = data[0].content_json ? JSON.parse(data[0].content_json) : null;
+  }
+} else if (tr) {
+  // Case 2: TR present but no ID → create new draft copying content
+  const { data: trData, error: trError } = await supabase
+    .from("draft")
+    .select("title, desc, thumb, content_json")
+    .eq("id", tr);
+
+  if (trError) {
+    console.error(trError);
+  }
+
+  const insertPayload = {
+    updated_at: new Date().toISOString(),
+    author: userId,
+    title: trData && trData.length > 0 ? `${trData[0].title} (Copy)` : '',
+    desc: trData && trData.length > 0 ? trData[0].desc : '',
+    thumb: trData && trData.length > 0 ? trData[0].thumb : null,
+    content_json:
+      trData && trData.length > 0 ? trData[0].content_json : null,
+  };
+
+  const { data: newDraft, error: insertError } = await supabase
+    .from("draft")
+    .insert(insertPayload)
+    .select("id");
+
+  if (insertError) {
+    console.error(insertError);
+  }
+
+  if (newDraft && newDraft.length > 0) {
+    return Astro.redirect(`/editor?id=${newDraft[0].id}`);
+  }
+} else {
   const { data, error } = await supabase
     .from("draft")
     .insert({ updated_at: new Date().toISOString(), author: userId })
@@ -31,16 +80,10 @@ if (!url) {
   }
 
   if (data && data.length > 0) {
-    const id = data[0].id;
-    return Astro.redirect(`/editor?id=${id}`);
+    return Astro.redirect(`/editor?id=${data[0].id}`);
   }
-} else {
-  const {data,error} = await supabase.from('draft').select('*').eq('id', url)
-  title = data && data.length > 0 ? data[0].title : '';
-  desc = data && data.length > 0 ? data[0].desc : '';
-  thumb = data && data.length > 0 ? data[0].thumb : null;
-  content = data && data.length > 0 ? JSON.parse(data[0].content_json) : null;
 }
+
 ---
 <Layout>
   <div class="lg:max-w-screen-md mx-auto overflow-hidden overflow-x-hidden">
@@ -50,14 +93,6 @@ if (!url) {
     </p>
     <ThumbnailUploader client:only initialUrl={thumb} />
     <EditorPage client:only savedContent={content} />
-    <div class="flex justify-end">
-      <a href={`/manage?id=${url}`}
-      id="smtbtn"
-        class="bg-accent-primary hover:bg-accent-hover cursor-pointer m-2 text-text-primary mt-4 px-8 py-2 rounded-xl"
-      >
-        <p>Submit</p>
-        <p class="animate-spin hidden"><Loader /></p>
-      </a>
-    </div>
+
   </div>
 </Layout>

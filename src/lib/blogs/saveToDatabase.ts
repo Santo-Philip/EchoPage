@@ -31,8 +31,6 @@ async function saveToDatabase(blogId: string, data: DraftContent) {
     throw new Error(`Failed to save. Status: ${response.status}`);
       
     }
-
-    // window.showToast('Success')
   } catch (err) {
     console.error("Failed to save to Supabase:", err);
     window.showToast('Something went wrong')

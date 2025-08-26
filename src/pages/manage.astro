@@ -1,6 +1,5 @@
 ---
-import Category from "@/components/category.astro";
-import FloatingInput from "@/components/FloatingInput.astro";
+import Category from "@/components/Category.astro";
 import SeoPreview from "@/components/searchPreview";
 
 import ThumbnailUploader from "@/components/ThumbnailUploader";
@@ -112,6 +111,27 @@ const domain = Astro.url.origin;
         class="px-10 border m-2 border-accent-primary rounded-xl py-2">Review</a
       >
     </div>
+
+        <p
+      class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-green-500/30 border-green-500"
+    >
+      Language
+    </p>
+<div class="gap-4 flex flex-col py-2">
+<div class="justify-between items-center w-full flex">
+<div class="flex gap-2">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+<p>Translate</p>
+</div>
+<a href={`editor?tr=${id}`} class="px-10 border m-2 border-accent-primary rounded-xl py-2">Start</a href={`editor?tr=${id}`}>
+</div>
+<div class="justify-between items-center w-full flex">
+  <div class="flex gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text-icon lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
+    Set Language
+  </div>
+</div>
+</div>
     <p
       class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
     >
