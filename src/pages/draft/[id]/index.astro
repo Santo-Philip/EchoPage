@@ -1,0 +1,73 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+const { id } = Astro.params;
+const { data, error } = await supabase
+  .from("draft")
+  .select("*")
+  .eq("id", id)
+  .single();
+---
+
+<Layout title={data?.title || "Draft"} desc="Draft details">
+  <div class="max-w-screen-md mx-auto p-6 min-h-screen space-y-6">
+    <div class="w-full px-4 py-3 border-l-4 border-blue-600 bg-blue-50 rounded">
+      <h2 class="text-blue-800 font-medium">
+        Preview of your draft
+      </h2>
+      <p class=" text-text-secondary">You can share this with anyone</p>
+    </div>
+    {error && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">Error loading draft</p>
+        <p class="text-sm">{error.message}</p>
+      </div>
+    )}
+
+    {data ? (
+      <article class="space-y-6">
+
+        <header>
+          <h1 class="text-3xl font-bold text-gray-900">
+            {data.title || "Untitled Draft"}
+          </h1>
+          <p class="mt-1 text-sm text-gray-500">
+            Status: <span class="font-medium capitalize">{data.status}</span>
+          </p>
+        </header>
+        {data.thumb && (
+          <div class="rounded-lg overflow-hidden shadow">
+            <img
+              src={data.thumb}
+              alt="Draft thumbnail"
+              class="w-full aspect-video object-cover"
+            />
+          </div>
+        )}
+
+        <div
+          class="prose prose-lg max-w-none prose-blue"
+          set:html={data.content_html}
+        >
+        </div>
+        <div class="flex justify-end gap-3 pt-6 border-t">
+          <a
+            href={`/manage?id=${id}`}
+            class="px-4 py-2 rounded-lg bg-accent-hover text-white transition"
+          >
+            Manage
+          </a>
+          <a
+            href={`/editor?id=${id}`}
+            class="px-8 py-2 rounded-lg bg-green-500 text-white transition"
+          >
+            Edit
+          </a>
+        </div>
+      </article>
+    ) : (
+      <p class="text-gray-500 italic">No draft found.</p>
+    )}
+  </div>
+</Layout>
