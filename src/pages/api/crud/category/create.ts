@@ -1,8 +1,8 @@
-import { slugify } from "@/lib/blogs/slug";
+import slugify from "@/lib/blogs/slug";
 import { supabase } from "@/lib/supabase";
 import type { APIRoute } from "astro";
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, redirect }) => {
   const emails: string[] = import.meta.env.EMAIL.split(",");
   const formData = await request.formData();
   const category = formData.get("category");
@@ -26,16 +26,17 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
   try {
-    const slug = slugify(category.toString());
+    const slug = await slugify(category.toString());
+    console.log(slug);
     const { error } = await supabase
       .from("categories")
-      .insert({ title: category,    description : desc, icon, slug });
+      .insert({ title: category, description : desc, icon, slug : slug });
     if (error) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
           })
     }
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return redirect("/dashboard");
   } catch (error) {}
   return new Response(JSON.stringify({ error: "Something went wrong" }), {
     status: 500,

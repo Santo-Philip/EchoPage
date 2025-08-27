@@ -37,6 +37,7 @@
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "sass-embedded": "^1.90.0"
   }
 }

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import './_variables.scss';
 @import './_keyframe-animations.scss';
+@plugin '@tailwindcss/typography';
 
 @theme {
   --color-bg-primary: oklch(95% 0.04 260);
@@ -53,7 +54,7 @@ html, body {
   font-family: "Nunito", sans-serif;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-    overflow-x: hidden;
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
   box-sizing: border-box;

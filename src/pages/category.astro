@@ -165,7 +165,7 @@ const { data: categories, error: categoriesError } = await supabase
     <p class="text-sm text-text-secondary">Manage blog categories here.</p>
     <form action="/api/crud/category/create" method="post" id="category-form" class="space-y-4">
       <FloatingInput label="Category" id="category" name="category" required />
-      <FloatingTextArea label="Description" id="desc" name="desc" required />
+      <FloatingTextArea rows="5" label="Description" id="desc" name="desc" required />
       <div class="icon-picker">
         <label class="block text-sm font-medium text-text-secondary">Select Icon</label>
         <div class="icons-grid grid grid-cols-4 md:grid-cols-6 gap-2 overflow-y-auto p-2 rounded">

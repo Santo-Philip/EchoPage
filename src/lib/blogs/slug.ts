@@ -9,7 +9,6 @@ async function slugify(title: string) {
 
   let slug = (value || "").trim().toLowerCase();
   if (!slug) slug = `post-${Date.now()}`;
-  console.log(slug);
   return slug;
 }
 

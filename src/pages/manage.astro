@@ -1,11 +1,10 @@
 ---
 import Category from "@/components/Category.astro";
 import SeoPreview from "@/components/searchPreview";
-
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
+import langauges from "@/lib/languages";
 import { supabase } from "@/lib/supabase";
-
 
 const id = Astro.url.searchParams.get("id");
 const user = await supabase.auth.getUser();
@@ -82,7 +81,7 @@ const domain = Astro.url.origin;
         contenteditable="true"
         class="w-full min-h-12 outline-none border-b border-text-muted p-2"
       >
-        {data[0].tags}
+     {data[0].tags.map((tag: string) => tag + ', ').join('')}
       </div>
       <div
         id="tags-suggestions"
@@ -95,7 +94,7 @@ const domain = Astro.url.origin;
         contenteditable="true"
         class="w-full min-h-12 outline-none border-b border-text-muted p-2"
       >
-        {data[0].keywords}
+       {data[0].keywords.map((keyword : string) => keyword + ', ').join('')}
       </div>
       <div
         id="keyword-suggestions"
@@ -112,75 +111,130 @@ const domain = Astro.url.origin;
       >
     </div>
 
-        <p
+    <p
       class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-green-500/30 border-green-500"
     >
       Language
     </p>
-<div class="gap-4 flex flex-col py-2">
-<div class="justify-between items-center w-full flex">
-<div class="flex gap-2">
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages-icon lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
-<p>Translate</p>
-</div>
-<a href={`editor?tr=${id}`} class="px-10 border m-2 border-accent-primary rounded-xl py-2">Start</a href={`editor?tr=${id}`}>
-</div>
-<div class="justify-between items-center w-full flex">
-  <div class="flex gap-2">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-text-icon lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
-    Set Language
-  </div>
-</div>
-</div>
-    <p
-      class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
-    >
-      Danger Zone
-    </p>
-
-    <div class="flex w-full mt-4 items-center justify-between">
-      <p>Archive this page</p>
-      <button
-        id="archivebtn"
-        data-id={data[0].status === "archived" ? "unarchive" : "archive"}
-        class="px-10 border m-2 border-amber-500 cursor-pointer rounded-xl py-2"
+    <div class="gap-4 flex flex-col py-2">
+      <div class="justify-between items-center w-full flex">
+        <div class="flex gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-languages-icon lucide-languages"
+            ><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path
+              d="M2 5h12"></path><path d="M7 2h1"></path><path
+              d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg
+          >
+          <p>Translate</p>
+        </div>
+        <a
+          href={`editor?tr=${id}`}
+          class="px-10 border m-2 border-accent-primary rounded-xl py-2"
+          >Start</a
+        >
+      </div>
+      <div class="justify-between flex-wrap gap-2 items-center w-full flex">
+        <div class="flex gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-scan-text-icon lucide-scan-text"
+            ><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path
+              d="M17 3h2a2 2 0 0 1 2 2v2"></path><path
+              d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path
+              d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path
+              d="M7 12h10"></path><path d="M7 16h6"></path></svg
+          >
+          Set Language
+        </div>
+        <select
+          id="language"
+          class="border bg-bg-secondary outline-none border-text-muted rounded-xl p-2"
+        >
+          <option value="">Select Language</option>
+          {
+            Object.entries(langauges).map(([code, name]) => (
+              <option value={code} selected={data[0].language === code}>
+                {name}
+              </option>
+            ))
+          }
+        </select>
+      </div>
+      <p
+        class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
       >
-        {data[0].status === "archived" ? "Unarchive" : "Archive"}
-      </button>
+        Danger Zone
+      </p>
+
+      <div class="flex w-full mt-4 items-center justify-between">
+        <p>Archive this page</p>
+        <button
+          id="archivebtn"
+          data-id={data[0].status === "archived" ? "unarchive" : "archive"}
+          class="px-10 border m-2 border-amber-500 cursor-pointer rounded-xl py-2"
+        >
+          {data[0].status === "archived" ? "Unarchive" : "Archive"}
+        </button>
+      </div>
     </div>
-  </div>
 
-  <script>
-    import aiClient from "@/lib/aiClient";
-    import autoSave from "@/lib/blogs/autosave";
-    import { getSearchParam } from "@/lib/blogs/getParams";
+    <script>
+      import aiClient from "@/lib/aiClient";
+      import autoSave from "@/lib/blogs/autosave";
+      import { getSearchParam } from "@/lib/blogs/getParams";
 
-    const title = document.getElementById("title") as HTMLDivElement;
-    const desc = document.getElementById("desc") as HTMLDivElement;
-    const tags = document.getElementById("tags") as HTMLDivElement;
-    const keywords = document.getElementById("keywords") as HTMLDivElement;
-    const archive = document.getElementById("archivebtn") as HTMLButtonElement;
-    const titleSuggestions = document.getElementById(
-      "title-suggestions"
-    ) as HTMLDivElement;
-    const descSuggestions = document.getElementById(
-      "descSuggestions"
-    ) as HTMLDivElement;
-    const keywordSuggestions = document.getElementById(
-      "keyword-suggestions"
-    ) as HTMLDivElement;
-    const tagSuggestions = document.getElementById(
-      "tags-suggestions"
-    ) as HTMLDivElement;
+      const title = document.getElementById("title") as HTMLDivElement;
+      const desc = document.getElementById("desc") as HTMLDivElement;
+      const tags = document.getElementById("tags") as HTMLDivElement;
+      const keywords = document.getElementById("keywords") as HTMLDivElement;
+      const archive = document.getElementById(
+        "archivebtn"
+      ) as HTMLButtonElement;
+      const language = document.getElementById("language") as HTMLSelectElement;
 
-    const id = getSearchParam("id");
+      language.addEventListener("change", () => {
+        const selectedLanguage = language.value;
+        autoSave(getSearchParam("id"), { lang: selectedLanguage });
+      });
 
-    async function getSEOSuggestions(query: string, desc: string) {
-      try {
-        const ai = await aiClient({
-          system:
-            "You are an SEO assistant. Return only valid JSON. No explanations, no comments.",
-          prompt: `Generate at least 5 SEO-friendly suggestions for the following query: "${query}" and description: "${desc}".
+      const titleSuggestions = document.getElementById(
+        "title-suggestions"
+      ) as HTMLDivElement;
+      const descSuggestions = document.getElementById(
+        "descSuggestions"
+      ) as HTMLDivElement;
+      const keywordSuggestions = document.getElementById(
+        "keyword-suggestions"
+      ) as HTMLDivElement;
+      const tagSuggestions = document.getElementById(
+        "tags-suggestions"
+      ) as HTMLDivElement;
+
+      const id = getSearchParam("id");
+
+      async function getSEOSuggestions(query: string, desc: string) {
+        try {
+          const ai = await aiClient({
+            system:
+              "You are an SEO assistant. Return only valid JSON. No explanations, no comments.",
+            prompt: `Generate at least 5 SEO-friendly suggestions for the following query: "${query}" and description: "${desc}".
       
 Return ONLY in this JSON format:
 {
@@ -194,114 +248,115 @@ Notes:
 - Titles and descriptions must be at least 5 items each.
 - Tags must be at least 5 items.
 - Keywords must be at least 15 items (mix of short-tail and long-tail).`,
-        });
+          });
 
-        return JSON.parse(ai);
-      } catch (error) {
-        window.showToast(`Failed to fetch SEO suggestions: ${error}`);
-        return null;
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const query = title.innerText;
-      const description = desc.innerText;
-      const suggestions = await getSEOSuggestions(query, description);
-      if (!suggestions) return;
-      titleSuggestions.innerHTML = "";
-      descSuggestions.innerHTML = "";
-      keywordSuggestions.innerHTML = "";
-      tagSuggestions.innerHTML = "";
-      suggestions.titles.forEach((titletxt: string) => {
-        const button = document.createElement("button");
-        button.classList.add("suggestions");
-        button.innerText = titletxt;
-        titleSuggestions.appendChild(button);
-        button.addEventListener("click", () => {
-          title.innerText = titletxt;
-        });
-      });
-      suggestions.descriptions.forEach((description: string) => {
-        const button = document.createElement("button");
-        button.classList.add("suggestions");
-        button.innerText = description;
-        descSuggestions.appendChild(button);
-        button.addEventListener("click", () => {
-          autoSave(id, { desc: description });
-          desc.innerText = description;
-        });
-      });
-      suggestions.keywords.forEach((keyword: string) => {
-        const button = document.createElement("button");
-        button.classList.add("suggestions");
-        button.innerText = keyword;
-        keywordSuggestions.appendChild(button);
-        button.addEventListener("click", () => {
-          const word = keywords.innerText;
-          keywords.innerText = word + keyword + ",";
-        });
-      });
-      suggestions.tags.forEach((tag: string) => {
-        const button = document.createElement("button");
-        button.classList.add("suggestions");
-        button.innerText = tag;
-        tagSuggestions.appendChild(button);
-        button.addEventListener("click", () => {
-          const word = tags.innerText;
-          tags.innerText = word + tag + ",";
-        });
-      });
-    });
-
-    archive.addEventListener("click", () => {
-      const status = archive.getAttribute("data-id");
-      if (status === "archive") {
-        autoSave(id, { status: "archived" });
-      } else {
-        autoSave(id, { status: "draft" });
-      }
-      window.location.reload();
-    });
-
-    function watchAndSave(
-      element: HTMLDivElement,
-      fieldName: string,
-      asArray = false
-    ) {
-      function extractValue() {
-        let value: string | string[] = element.innerText.trim();
-        if (asArray) {
-          value = [
-            ...new Set(
-              value
-                .split(",") 
-                .map((v) => v.trim())
-                .filter(Boolean)
-            ),
-          ];
+          return JSON.parse(ai);
+        } catch (error) {
+          window.showToast(`Failed to fetch SEO suggestions: ${error}`);
+          return null;
         }
-
-        autoSave(id, { [fieldName]: value });
       }
-      element.addEventListener("input", extractValue);
-      const observer = new MutationObserver(() => {
-        extractValue();
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const query = title.innerText;
+        const description = desc.innerText;
+        const suggestions = await getSEOSuggestions(query, description);
+        if (!suggestions) return;
+        titleSuggestions.innerHTML = "";
+        descSuggestions.innerHTML = "";
+        keywordSuggestions.innerHTML = "";
+        tagSuggestions.innerHTML = "";
+        suggestions.titles.forEach((titletxt: string) => {
+          const button = document.createElement("button");
+          button.classList.add("suggestions");
+          button.innerText = titletxt;
+          titleSuggestions.appendChild(button);
+          button.addEventListener("click", () => {
+            title.innerText = titletxt;
+          });
+        });
+        suggestions.descriptions.forEach((description: string) => {
+          const button = document.createElement("button");
+          button.classList.add("suggestions");
+          button.innerText = description;
+          descSuggestions.appendChild(button);
+          button.addEventListener("click", () => {
+            autoSave(id, { desc: description });
+            desc.innerText = description;
+          });
+        });
+        suggestions.keywords.forEach((keyword: string) => {
+          const button = document.createElement("button");
+          button.classList.add("suggestions");
+          button.innerText = keyword;
+          keywordSuggestions.appendChild(button);
+          button.addEventListener("click", () => {
+            const word = keywords.innerText;
+            keywords.innerText = word + keyword + ",";
+          });
+        });
+        suggestions.tags.forEach((tag: string) => {
+          const button = document.createElement("button");
+          button.classList.add("suggestions");
+          button.innerText = tag;
+          tagSuggestions.appendChild(button);
+          button.addEventListener("click", () => {
+            const word = tags.innerText;
+            tags.innerText = word + tag + ",";
+          });
+        });
       });
 
-      observer.observe(element, {
-        childList: true,
-        characterData: true,
-        subtree: true,
+      archive.addEventListener("click", () => {
+        const status = archive.getAttribute("data-id");
+        if (status === "archive") {
+          autoSave(id, { status: "archived" });
+        } else {
+          autoSave(id, { status: "draft" });
+        }
+        window.location.reload();
       });
-    }
 
-    watchAndSave(title, "title");
-    watchAndSave(desc, "desc");
-    watchAndSave(keywords, "keywords", true);
-    watchAndSave(tags, "tags", true);
+      function watchAndSave(
+        element: HTMLDivElement,
+        fieldName: string,
+        asArray = false
+      ) {
+        function extractValue() {
+          let value: string | string[] = element.innerText.trim();
+          if (asArray) {
+            value = [
+              ...new Set(
+                value
+                  .split(",")
+                  .map((v) => v.trim())
+                  .filter(Boolean)
+              ),
+            ];
+          }
 
-   document.addEventListener("categoryChange", (e) => {
-    autoSave(id,{category : (e as CustomEvent).detail.category})
-  });
-  </script>
+          autoSave(id, { [fieldName]: value });
+        }
+        element.addEventListener("input", extractValue);
+        const observer = new MutationObserver(() => {
+          extractValue();
+        });
+
+        observer.observe(element, {
+          childList: true,
+          characterData: true,
+          subtree: true,
+        });
+      }
+
+      watchAndSave(title, "title");
+      watchAndSave(desc, "desc");
+      watchAndSave(keywords, "keywords", true);
+      watchAndSave(tags, "tags", true);
+
+      document.addEventListener("categoryChange", (e) => {
+        autoSave(id, { category: (e as CustomEvent).detail.category });
+      });
+    </script>
+  </div>
 </Layout>

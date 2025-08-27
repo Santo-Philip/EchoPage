@@ -26,10 +26,10 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
 <nav
   class="fixed z-50 flex top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 items-center justify-between"
 >
-  <div class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
+  <a href="/" class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
     <img src="/logo.png" alt="logo" height="40" width="40" />
     <h2>{import.meta.env.NAME}</h2>
-  </div>
+  </a>
   <div class="flex gap-4">
     <div class="hidden md:flex items-center gap-4 text-text-primary">
       {
