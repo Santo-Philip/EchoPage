@@ -12,7 +12,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
       status: 401,
     });
   }
-  // Allow only users from env according to email
+  // Allow only users from env to post, according to email
   // if (!email.includes(user.data.user.email)) {
   //   return new Response(JSON.stringify({ error: "Not Allowed" }), { status: 401 })
   // }
@@ -22,12 +22,14 @@ export const PATCH: APIRoute = async ({ request, params }) => {
     .eq("id", blogId);
 
   if (existingDataerror) {
+    console.log(existingDataerror);
     return new Response(JSON.stringify({ error: existingDataerror.message }), {
       status: 500,
     });
   }
 
   if (existing.length === 0) {
+    console.log(existing);
     return new Response(JSON.stringify({ error: "Blog not found" }), {
       status: 404,
     });
@@ -53,7 +55,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
     });
   }
   if (
-    data.status === "publish" &&
+    data.status === "public" &&
     !email.includes(user.data.user.email || "")
   ) {
     return new Response(JSON.stringify({ error: "Not Allowed to publish" }), {
@@ -67,6 +69,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
       .update(data)
       .eq("id", blogId);
     if (error) {
+      console.log(error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
       });

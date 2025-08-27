@@ -138,7 +138,7 @@ const domain = Astro.url.origin;
           <p>Translate</p>
         </div>
         <a
-          href={`/draft/editor?tr=${id}`}
+          href={`editor?tr=${id}`}
           class="px-10 border m-2 border-accent-primary rounded-xl py-2"
           >Start</a>
       </div>
@@ -184,7 +184,7 @@ const domain = Astro.url.origin;
         Publish Settings
       </p>
       <div class="flex w-full mt-4 items-center justify-between">
-        <PostScheduler id={userId} client:only/>
+        <PostScheduler id={id} client:only/>
       </div> : 
       <p
         class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
@@ -322,7 +322,7 @@ Notes:
         if (status === "archive") {
           autoSave(id, { status: "archived" });
         } else {
-          
+
           autoSave(id, { status: "pending" });
         }
         window.location.reload();

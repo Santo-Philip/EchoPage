@@ -37,7 +37,6 @@ if (id) {
     content = data[0].content_json ? JSON.parse(data[0].content_json) : null;
   }
 } else if (tr) {
-  // Case 2: TR present but no ID → create new draft copying content
   const { data: trData, error: trError } = await supabase
     .from("draft")
     .select("title, desc, thumb, content_json")
@@ -50,7 +49,7 @@ if (id) {
   const insertPayload = {
     updated_at: new Date().toISOString(),
     author: userId,
-    title: trData && trData.length > 0 ? `${trData[0].title} (Copy)` : '',
+    title: trData && trData.length > 0 ? `${trData[0].title}` : '',
     desc: trData && trData.length > 0 ? trData[0].desc : '',
     thumb: trData && trData.length > 0 ? trData[0].thumb : null,
     content_json:
@@ -67,7 +66,7 @@ if (id) {
   }
 
   if (newDraft && newDraft.length > 0) {
-    return Astro.redirect(`/editor?id=${newDraft[0].id}`);
+    return Astro.redirect(`/draft/editor?id=${newDraft[0].id}`);
   }
 } else {
   const { data, error } = await supabase
@@ -80,7 +79,7 @@ if (id) {
   }
 
   if (data && data.length > 0) {
-    return Astro.redirect(`/editor?id=${data[0].id}`);
+    return Astro.redirect(`/draft/editor?id=${data[0].id}`);
   }
 }
 

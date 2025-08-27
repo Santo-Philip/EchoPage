@@ -14,7 +14,7 @@ export interface DraftContent {
   category?: string;
   keywords?: string[];
   author?: string;
-  schedule? : number | 0;
+  schedule? : string;
 }
 
 async function saveToDatabase(blogId: string, data: DraftContent) {

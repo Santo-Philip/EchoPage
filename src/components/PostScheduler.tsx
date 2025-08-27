@@ -3,21 +3,19 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-interface Props{
-    id : string
+interface Props {
+  id: string;
 }
 
-const PostScheduler: React.FC<Props> = ({id} : Props) => {
+const PostScheduler: React.FC<Props> = ({ id }: Props) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<Date | null>(null);
 
-  
   const isScheduled = selectedDate && selectedTime;
   const buttonText = isScheduled ? "Schedule" : "Publish";
 
   const handleSubmit = () => {
-    if (isScheduled && selectedDate && selectedTime) {
-      
+    if (selectedDate && selectedTime) {
       const combined = new Date(
         selectedDate.getFullYear(),
         selectedDate.getMonth(),
@@ -25,11 +23,21 @@ const PostScheduler: React.FC<Props> = ({id} : Props) => {
         selectedTime.getHours(),
         selectedTime.getMinutes()
       );
-      const timestamp = combined.getTime();
-      autoSave(id,{schedule : timestamp, status : 'pending'})
-      window.showToast(`Post Scheduled at ${combined.toLocaleString()}`)
+
+      const isoString = combined.toISOString();
+
+      console.log(id);
+      autoSave(id, { schedule: isoString, status: "pending" });
+
+      window.showToast(`Post Scheduled at ${combined.toLocaleString()}`);
+      window.location.href = "/a/dashboard";
     } else {
-        window.showToast('Post will be public after review')
+      const nowIso = new Date().toISOString();
+      console.log(id);
+      autoSave(id, { status: "pending", schedule: nowIso });
+
+      window.showToast("Post will be public after review");
+      window.location.href = "/a/dashboard";
     }
   };
 

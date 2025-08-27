@@ -58,13 +58,13 @@ const user = await supabase.auth.getUser();
         <div class="flex flex-wrap justify-end gap-3 pt-6 border-t">
 
           <a
-            href={`/manage?id=${id}`}
+            href={`/draft/manage?id=${id}`}
             class="px-4 py-2 rounded-lg bg-accent-hover text-white transition"
           >
             Manage
           </a>
           <a
-            href={`/editor?id=${id}`}
+            href={`/draft/editor?id=${id}`}
             class="px-8 py-2 rounded-lg bg-green-500 text-white transition"
           >
             Edit
