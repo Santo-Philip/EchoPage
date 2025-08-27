@@ -67,7 +67,7 @@ export default function EditorPage({ savedContent }: EditorPageProps) {
             const {title} = extractTitleAndDescription(editor.getJSON())
             const slug = await slugify(title)
             autoSave(getSearchParam("id"), {slug})
-            window.location.href = `/manage?id=${getSearchParam("id")}`;
+            window.location.href = `/draft/manage?id=${getSearchParam("id")}`;
           }}
           className="flex items-center gap-2 bg-accent-primary hover:bg-accent-hover text-text-primary cursor-pointer px-6 py-2 rounded-xl transition"
         >

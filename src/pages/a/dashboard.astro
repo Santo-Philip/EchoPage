@@ -28,6 +28,8 @@ const { data: blogData, error: blogError, count } = await supabase
   .range(from, to);
 
 const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
+
+const emails: string[] = import.meta.env.EMAIL.split(",");
 ---
 
 <Layout title="Dashboard" desc="Welcome to your dashboard">
@@ -44,11 +46,31 @@ const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
       </form>
     </div>
 
+{ emails.includes(user.email || '') && (
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    <a href="/messages" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
+      <p class=" text-xl font-semibold text-text-primary">Messages</p>
+      <p class="text-sm text-text-secondary mt-1">View messages </p>
+    </a>
+    <a href="/review" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
+      <p class=" text-xl font-semibold text-text-primary">Post Management</p>
+      <p class="text-sm text-text-secondary mt-1">Review and manage posts</p>
+    </a>
+    <a href="/a/category" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
+      <p class=" text-xl font-semibold text-text-primary">Category Management</p>
+      <p class="text-sm text-text-secondary mt-1">View and manage categories</p>
+    </a>
+    <a href="/" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
+      <p class=" text-xl font-semibold text-text-primary">Platform Analytics</p>
+      <p class="text-sm text-text-secondary mt-1">View Platform data and analytics</p>
+    </a>
 
+  </div>
+  )}
     <div class="mt-12 text-center">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
       <a
-        href="/editor"
+        href="/draft/editor"
         class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-8 py-4 rounded-2xl text-lg shadow transition"
       >
         ✍️ Write New Post
