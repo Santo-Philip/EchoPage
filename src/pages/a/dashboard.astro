@@ -40,7 +40,8 @@ const emails: string[] = import.meta.env.EMAIL.split(",");
         <p class="text-gray-600">Manage your posts and account settings here.</p>
       </div>
       <form action="api/auth/signout" method="get">
-        <button class="bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl shadow">
+        <button class="bg-red-500 flex gap-3 hover:bg-red-600 text-white font-medium px-5 py-2 rounded-xl shadow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
           Logout
         </button>
       </form>
@@ -77,8 +78,10 @@ const emails: string[] = import.meta.env.EMAIL.split(",");
       </a>
     </div>
     <div class="mt-16">
+      <div class="flex gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rss-icon lucide-rss"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
       <h2 class="text-xl font-bold text-gray-900 mb-4">Your Published Posts</h2>
-
+</div>
       {blogData && blogData.length > 0 ? (
         <div class="gap-2 grid-cols-1 grid  md:grid-cols-2">
           {blogData.map((blog) => (

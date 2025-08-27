@@ -43,18 +43,13 @@ const PostScheduler: React.FC<Props> = ({ id }: Props) => {
 
   return (
     <div className="flex flex-col gap-4 w-full p-4 rounded shadow">
-      <h3>Schedule Post:</h3>
-
-      {/* Date Picker */}
       <DatePicker
         selected={selectedDate}
         onChange={(date) => setSelectedDate(date)}
-        dateFormat="yyyy-MM-dd"
+        dateFormat="dd-mm-yyyy"
         placeholderText="Select Date"
         className="mt-1 py-2 px-6 outline-none border border-text-muted rounded-full w-full"
       />
-
-      {/* Time Picker */}
       <DatePicker
         selected={selectedTime}
         onChange={(time) => setSelectedTime(time)}
