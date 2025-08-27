@@ -8,12 +8,13 @@ export interface DraftContent {
   content_html? : string;
   slug?: string;
   lang?: string;
-  status?: string;
+  status?: "draft" | "public" | "pending" | "archived";
   updated_at?: string;
   tags?: string[];
   category?: string;
   keywords?: string[];
   author?: string;
+  schedule? : number | 0;
 }
 
 async function saveToDatabase(blogId: string, data: DraftContent) {

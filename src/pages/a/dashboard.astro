@@ -52,7 +52,7 @@ const emails: string[] = import.meta.env.EMAIL.split(",");
       <p class=" text-xl font-semibold text-text-primary">Messages</p>
       <p class="text-sm text-text-secondary mt-1">View messages </p>
     </a>
-    <a href="/review" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
+    <a href="/a/review" class="bg-bg-secondary p-5 rounded-xl outline outline-accent-hover  shadow-md hover:shadow-xl transition text-center">
       <p class=" text-xl font-semibold text-text-primary">Post Management</p>
       <p class="text-sm text-text-secondary mt-1">Review and manage posts</p>
     </a>
@@ -97,7 +97,7 @@ const emails: string[] = import.meta.env.EMAIL.split(",");
                   {new Date(blog.created_at).toLocaleDateString()}
                 </span>
                 <a
-                  href={`/manage?id=${blog.id}`}
+                  href={`/draft/manage?id=${blog.id}`}
                   class="text-blue-500 hover:underline text-sm"
                 >
                   Manage →

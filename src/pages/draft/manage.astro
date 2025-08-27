@@ -1,5 +1,6 @@
 ---
 import Category from "@/components/Category.astro";
+import PostScheduler from "@/components/PostScheduler";
 import SeoPreview from "@/components/searchPreview";
 import ThumbnailUploader from "@/components/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
@@ -81,7 +82,7 @@ const domain = Astro.url.origin;
         contenteditable="true"
         class="w-full min-h-12 outline-none border-b border-text-muted p-2"
       >
-     {data[0].tags.map((tag: string) => tag + ', ').join('')}
+     {data[0].tags?.map((tag: string) => tag + ', ').join('') || ''}
       </div>
       <div
         id="tags-suggestions"
@@ -94,7 +95,7 @@ const domain = Astro.url.origin;
         contenteditable="true"
         class="w-full min-h-12 outline-none border-b border-text-muted p-2"
       >
-       {data[0].keywords.map((keyword : string) => keyword + ', ').join('')}
+       {data[0]?.keywords?.map((keyword : string) => keyword + ', ').join('') || ''}
       </div>
       <div
         id="keyword-suggestions"
@@ -137,10 +138,9 @@ const domain = Astro.url.origin;
           <p>Translate</p>
         </div>
         <a
-          href={`editor?tr=${id}`}
+          href={`/draft/editor?tr=${id}`}
           class="px-10 border m-2 border-accent-primary rounded-xl py-2"
-          >Start</a
-        >
+          >Start</a>
       </div>
       <div class="justify-between flex-wrap gap-2 items-center w-full flex">
         <div class="flex gap-2">
@@ -177,6 +177,15 @@ const domain = Astro.url.origin;
           }
         </select>
       </div>
+      {data[0].status === "draft" ?
+            <p
+        class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-blue-500/30 border-blue-500"
+      >
+        Publish Settings
+      </p>
+      <div class="flex w-full mt-4 items-center justify-between">
+        <PostScheduler id={userId} client:only/>
+      </div> : 
       <p
         class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
       >
@@ -193,6 +202,7 @@ const domain = Astro.url.origin;
           {data[0].status === "archived" ? "Unarchive" : "Archive"}
         </button>
       </div>
+    }
     </div>
 
     <script>
@@ -312,7 +322,8 @@ Notes:
         if (status === "archive") {
           autoSave(id, { status: "archived" });
         } else {
-          autoSave(id, { status: "draft" });
+          
+          autoSave(id, { status: "pending" });
         }
         window.location.reload();
       });

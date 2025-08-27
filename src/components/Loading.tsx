@@ -19,7 +19,6 @@ export default function Loading() {
       window.showLoading = (show: boolean, fullScreen = false) => {
         setLoading({ show, fullScreen });
         if (fullScreen) {
-          // disable scroll
           document.body.style.overflow = show ? "hidden" : "";
         }
       };
