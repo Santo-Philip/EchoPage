@@ -155,62 +155,103 @@ if (userData.user.email !== adminEmail) {
 const { data: categories, error: categoriesError } = await supabase
   .from("categories")
   .select("*")
-  .order("name", { ascending: true });
-
+  .order("title", { ascending: true });
 ---
 
 <Layout title="Manage Categories" desc="Manage blog categories">
-  <section class="max-w-screen-md mx-auto overflow-hidden overflow-x-hidden p-2">
+  <section
+    class="max-w-screen-md mx-auto overflow-hidden overflow-x-hidden p-2"
+  >
     <h1>Manage Categories</h1>
     <p class="text-sm text-text-secondary">Manage blog categories here.</p>
-    <form action="/api/crud/category/create" method="post" id="category-form" class="space-y-4">
+    <form
+      action="/api/crud/category/create"
+      method="post"
+      id="category-form"
+      class="space-y-4"
+    >
       <FloatingInput label="Category" id="category" name="category" required />
-      <FloatingTextArea rows="5" label="Description" id="desc" name="desc" required />
+      <FloatingTextArea
+        rows="5"
+        label="Description"
+        id="desc"
+        name="desc"
+        required
+      />
       <div class="icon-picker">
-        <label class="block text-sm font-medium text-text-secondary">Select Icon</label>
-        <div class="icons-grid grid grid-cols-4 md:grid-cols-6 gap-2 overflow-y-auto p-2 rounded">
-          {blogIcons.map((name) => {
-            const Icon = iconMap[name];
-            return (
-              <button
-                type="button"
-                class={`icon-btn p-2 rounded hover:bg-gray-200 flex flex-col items-center justify-center gap-1`}
-                data-icon={name}
-                aria-label={name}
-              >
-                <Icon class="w-6 h-6 text-gray-700" />
-                <span class="text-sm text-text-muted">{name}</span>
-              </button>
-            );
-          })}
+        <label class="block text-sm font-medium text-text-secondary"
+          >Select Icon</label
+        >
+        <div
+          class="icons-grid grid grid-cols-4 md:grid-cols-6 gap-2 overflow-y-auto p-2 rounded"
+        >
+          {
+            blogIcons.map((name) => {
+              const Icon = iconMap[name];
+              return (
+                <button
+                  type="button"
+                  class={`icon-btn p-2 rounded hover:bg-gray-200 flex flex-col items-center justify-center gap-1`}
+                  data-icon={name}
+                  aria-label={name}
+                >
+                  <Icon class="w-6 h-6 text-gray-700" />
+                  <span class="text-sm text-text-muted">{name}</span>
+                </button>
+              );
+            })
+          }
         </div>
         <input type="hidden" id="selected-icon" name="icon" />
       </div>
 
       <button
         type="submit"
-        class=" py-2 bg-bg-primary text-text-primary border border-accent-hover hover:bg-accent-primary hover:text-text-primary rounded-full px-10 "
+        class="py-2 bg-bg-primary text-text-primary border border-accent-hover hover:bg-accent-primary hover:text-text-primary rounded-full px-10"
       >
         Create Category
       </button>
     </form>
-    {categories && categories.length > 0 && (
-      <div class="mt-8">
-        <h2 class="text-lg font-semibold">Existing Categories</h2>
-        <ul class="space-y-2">
-          {categories.map((category) => (
-            <li class="flex items-center gap-2">
-              {category.icon && iconMap[category.icon] && (() => {
-                const Icon = iconMap[category.icon];
-                return <Icon class="w-5 h-5 text-gray-700" />;
-              })()}
-              <span>{category.name}</span>
-              <span class="text-sm text-text-secondary">({category.desc})</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
+    {
+      categories && categories.length > 0 && (
+        <div class="mt-8">
+          <h2 class="text-lg font-semibold">Existing Categories</h2>
+          <p class="text-sm text-text-secondary border-l-4 p-2 border-amber-500">
+            Warning : Deleting a category will re-assign all associated posts to
+            the default category.
+          </p>
+          <ul class="space-y-3 my-4 grid-cols-1 grid md:grid-cols-2 gap-2 ">
+            {categories.map((category) => (
+              <li class="flex flex-col gap-4 p-2 bg-bg-secondary rounded-xl shadow-sm hover:shadow-md transition">
+                <div class="flex flex-col gap-3">
+                  <div class="flex gap-4 items-center">
+                    {category.icon &&
+                      iconMap[category.icon] &&
+                      (() => {
+                        const Icon = iconMap[category.icon];
+                        return <Icon class="w-6 h-6 text-blue-600" />;
+                      })()}
+                    <p class="text-2xl text-text-primary">{category.title}</p>
+                  </div>
+                  <p class="text-sm text-text-secondary">
+                    {category.description}
+                  </p>
+                </div>
+                <form action="/api/crud/category/delete" method="post">
+                  <input type="hidden" name="id" value={category.id} />
+                  <button
+                    type="submit"
+                    class="px-3 w-full py-1.5 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg shadow transition"
+                  >
+                    Delete
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
   </section>
 
   <style>
@@ -236,17 +277,20 @@ const { data: categories, error: categoriesError } = await supabase
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const selectedIconInput = document.getElementById("selected-icon") as HTMLInputElement;
-      const iconButtons = document.querySelectorAll(".icon-btn") as NodeListOf<HTMLButtonElement>;
+      const selectedIconInput = document.getElementById(
+        "selected-icon"
+      ) as HTMLInputElement;
+      const iconButtons = document.querySelectorAll(
+        ".icon-btn"
+      ) as NodeListOf<HTMLButtonElement>;
 
       iconButtons.forEach((button) => {
         button.addEventListener("click", () => {
           iconButtons.forEach((btn) => btn.classList.remove("selected"));
           button.classList.add("selected");
-          selectedIconInput.value = button.dataset.icon || '';
+          selectedIconInput.value = button.dataset.icon || "";
         });
       });
-     
     });
   </script>
 </Layout>
