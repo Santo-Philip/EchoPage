@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+const emails: string[] = import.meta.env.EMAIL.split(",");
+const user = await supabase.auth.getUser();
+if (!user.data.user?.id || !emails.includes(user.data.user?.email || '')) {
+  return Astro.redirect("/");
+}
+
+const { data, error } = await supabase
+  .from("messages")
+  .select("*")
+  .order("created_at", { ascending: false });
+---
+<Layout title="Messages" desc="View messages">
+  <div class="max-w-screen-md mx-auto p-6 min-h-screen space-y-6">
+    <div class="w-full rounded">
+      <h1 class="text-text-primary font-medium">Messages</h1>
+      <p class="text-text-secondary">View messages sent via the contact form</p>
+    </div>
+    {error && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">Error loading messages</p>
+        <p class="text-sm">{error.message}</p>
+      </div>
+    )}
+    {data && data.length > 0 ? (
+      <div class="space-y-4">
+        {data.map((message) => (
+          <div class="border border-text-muted rounded-2xl shadow-sm p-4" id={message.id}>
+            <h2 class="font-medium text-lg mb-2">{message.name || "No Name"}</h2>
+            <p class="text-text-secondary mb-2">{message.email || "No Email"}</p>
+            <div class="prose prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
+              <p>{message.msg || "No Message"}</p>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">Sent on: {new Date(message.created_at).toLocaleString()}</p>
+            <form action="/api/crud/messages/delete" method="post">
+              <input type="hidden" name="id" value={message.id} />
+                <button type="submit" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm shadow transition">
+                    Delete
+                </button>
+</form>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-500">No messages found.</p>
+    )}
+  </div>
+</Layout>
