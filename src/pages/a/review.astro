@@ -63,7 +63,7 @@ const errorMsg = Astro.url.searchParams.get("error");
             <div class="mt-4 flex">
                 <form action="/api/crud/data/review" class="w-full" method="post">
                   <input type="hidden" name="id" value={post.id} />
-                  <input type="hidden" name="status" value="publish" />
+                  <input type="hidden" name="status" value="public" />
               <button
                 class="bg-blue-500 w-full hover:bg-blue-600 text-white p-4 text-center rounded-bl-xl text-sm shadow transition"
               >

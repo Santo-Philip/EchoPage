@@ -1,0 +1,113 @@
+---
+import { supabase } from "@/lib/supabase";
+import Layout from "@/layouts/Layout.astro";
+import { iconMap } from "@/lib/blogs/icons";
+
+const category = Astro.params.category;
+const now = new Date().toISOString();
+
+const PAGE_SIZE = 8;
+const page = parseInt(Astro.url.searchParams.get("page") || "1");
+const start = (page - 1) * PAGE_SIZE;
+const end = start + PAGE_SIZE - 1;
+
+
+const { data: cat, error: errorcat } = await supabase
+  .from("categories")
+  .select("*")
+  .eq("slug", category)
+  .single();
+
+if (errorcat || !cat) {
+  return Astro.redirect("/404");
+}
+
+const { data: posts, error } = await supabase
+  .from("draft")
+  .select("*")
+  .eq("category", category)
+  .eq("status", "public")
+  .or(`schedule.lte.${now},schedule.is.null`)
+  .order("schedule", { ascending: false })
+  .range(start, end);
+
+const Icon = iconMap[cat?.icon];
+---
+
+<Layout
+  title={`${cat?.title || "Category"} Posts`}
+  desc={`${cat?.description || ""}`}
+>
+  <div class="max-w-screen-md mx-auto p-2">
+    <h2 class="text-2xl flex gap-4 font-bold items-center text-text-primary mb-2">
+      {Icon && <Icon />}
+      {cat?.title || "Category"} Posts
+    </h2>
+
+    {cat?.description && (
+      <p class="text-sm text-text-secondary border-l-2 border-text-primary pl-3 py-2 mb-6">
+        {cat.description}
+      </p>
+    )}
+
+    {error && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">Error loading posts</p>
+        <p class="text-sm">{error.message}</p>
+      </div>
+    )}
+
+    {posts && posts.length > 0 ? (
+      <>
+        <div class="grid gap-2 grid-cols-1 md:grid-cols-2">
+          {posts.map((post) => (
+            <a
+              href={`/b/${post.category}/${post.slug}`}
+              class="block border border-text-muted rounded-2xl shadow-sm bg-bg-secondary hover:shadow-md transition"
+            >
+              {post.thumb && (
+                <img
+                  src={post.thumb}
+                  alt="thumbnail"
+                  class="aspect-video rounded-lg object-cover"
+                />
+              )}
+              <h3 class="font-semibold text-lg p-2">{post.title}</h3>
+              <p class="text-sm p-2 text-text-secondary ">
+                {post.desc || "No content available."}
+              </p>
+              <p class="text-xs p-2 text-gray-500">
+                {post.schedule
+                  ? new Date(post.schedule).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+      
+                    })
+                  : new Date(post.created_at).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+    
+                    })}
+              </p>
+            </a>
+          ))}
+        </div>
+
+        {posts.length === PAGE_SIZE && (
+          <div class="flex justify-center mt-6">
+            <a
+              href={`?page=${page + 1}`}
+              class="px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+              Load More
+            </a>
+          </div>
+        )}
+      </>
+    ) : (
+      <p class="text-gray-500">No posts found in this category.</p>
+    )}
+  </div>
+</Layout>

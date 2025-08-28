@@ -1,0 +1,38 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+const slug = Astro.params.slug;
+const category = Astro.params.category;
+const now = new Date().toISOString();
+
+const { data: post, error } = await supabase
+  .from("draft")
+  .select("*")
+  .eq("slug", slug)
+  .eq("category", category)
+  .eq("status", "public")
+  .or(`schedule.lte.${now},schedule.is.null`)
+
+if (error || !post) {
+  return Astro.redirect("/404");
+}
+---
+
+<Layout title={post[0]?.title || "Post"} desc={post[0]?.desc || "Blog post"}>
+  <div class="max-w-screen-md mx-auto p-6 min-h-screen space-y-6">
+    {error && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">Error loading post</p>
+        <p class="text-sm">{error}</p>
+      </div>
+    )}
+
+    {post && (
+      <article class="prose prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
+        <img src={post[0]?.thumb} alt="thumbnail" class="aspect-video rounded-lg object-cover" />
+        <div class="mt-4" set:html={post[0]?.content_html}></div>
+      </article>
+    )}
+  </div>
+</Layout>
