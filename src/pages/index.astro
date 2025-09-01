@@ -2,8 +2,10 @@
 import FAQ from '@/components/home/FAQ.astro';
 import Layout from '@/layouts/Layout.astro';
 import { iconMap } from '@/lib/blogs/icons';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
+const { env } = Astro.locals.runtime;
 
+const supabase = getSupabaseClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 const [categories, latestPosts, featuredPosts] = await Promise.all([
   supabase.from('categories').select('*').then(res => res.data),
   supabase.from('draft').select('*').order('created_at', { ascending: false }).limit(5).then(res => res.data),
