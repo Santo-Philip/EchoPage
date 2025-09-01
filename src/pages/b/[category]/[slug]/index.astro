@@ -19,7 +19,7 @@ if (error || !post) {
 }
 ---
 
-<Layout title={post[0]?.title || "Post"} desc={post[0]?.desc || "Blog post"}>
+<Layout title={post[0]?.title || "Post"} keywords={post[0]?.keywords || post[0]?.slug} desc={post[0]?.desc || "Blog post"}>
   <div class="max-w-screen-md mx-auto p-6 min-h-screen space-y-6">
     {error && (
       <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">

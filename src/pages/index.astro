@@ -1,4 +1,5 @@
 ---
+import FAQ from '@/components/home/FAQ.astro';
 import Layout from '@/layouts/Layout.astro';
 import { iconMap } from '@/lib/blogs/icons';
 import { supabase } from '@/lib/supabase';
@@ -39,11 +40,11 @@ const Icon = iconMap[categories?.[0]?.icon];
           class="relative overflow-hidden rounded-2xl shadow-xl group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
         >
           <img src={post.thumb} alt={post.title} class="w-full h-96 object-cover transition-transform duration-700 group-hover:scale-110"/>
-          <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent opacity-90 group-hover:opacity-70 transition-opacity duration-300"></div>
+          <div class="absolute inset-0 bg-gray-900/80 group-hover:bg-gray-900/70 transition-opacity duration-300"></div>
           <div class="absolute bottom-8 left-8 right-8 text-white z-10">
-            <h3 class="text-3xl font-serif font-semibold mb-3">{post.title}</h3>
-            <p class="text-base font-light max-w-md leading-relaxed">{post.description}</p>
-            <a href={`/blog/${post.slug}`} class="inline-block mt-6 text-indigo-300 font-medium hover:text-indigo-200 transition-colors duration-200">
+            <h3 class="text-3xl font-serif text-white font-semibold mb-3">{post.title}</h3>
+            <p class="text-base font-light max-w-md leading-relaxed">{post.desc}</p>
+            <a href={`/b/${post.category}/${post.slug}`} class="inline-block mt-6 text-indigo-300 font-medium hover:text-indigo-200 transition-colors duration-200">
               Read More →
             </a>
           </div>
@@ -92,6 +93,7 @@ const Icon = iconMap[categories?.[0]?.icon];
       </a>
     ))}
   </div>
+  <FAQ />
 </section>
 
 </Layout>

@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.7",
     "@astrojs/react": "^4.3.0",
     "@lucide/astro": "^0.539.0",
     "@supabase/supabase-js": "^2.55.0",

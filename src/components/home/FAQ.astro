@@ -1,0 +1,32 @@
+---
+const faqs = [
+  {
+    question: "How often do you publish new articles?",
+    answer: "We publish new blog posts every week, covering topics like tech, lifestyle, and tutorials."
+  },
+  {
+    question: "Can I contribute to this blog?",
+    answer: "Yes! We welcome guest posts. Please contact us via the contact page for submission guidelines."
+  },
+  {
+    question: "Do you have a newsletter?",
+    answer: "Absolutely. Subscribe to our newsletter to get updates on the latest articles and special content."
+  },
+  {
+    question: "Can I share your articles?",
+    answer: "Of course! Feel free to share our articles on social media or link back to our blog."
+  }
+];
+---
+
+<section class="max-w-3xl mx-auto py-12 px-6">
+  <h2 class="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
+  <div class="space-y-4">
+    {faqs.map((faq, index) => (
+      <details class="border rounded-lg p-4" >
+        <summary class="cursor-pointer font-semibold text-lg">{faq.question}</summary>
+        <p class="mt-2 text-gray-700 dark:text-gray-300">{faq.answer}</p>
+      </details>
+    ))}
+  </div>
+</section>
