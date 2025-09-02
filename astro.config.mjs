@@ -1,16 +1,22 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
-import tailwindcss from '@tailwindcss/vite';
-import react from '@astrojs/react';
-import cloudflare from '@astrojs/cloudflare';
+import tailwindcss from "@tailwindcss/vite";
+import react from "@astrojs/react";
+import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
-  output : 'server',
+  output: "server",
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
 
   integrations: [react()],
-  adapter: cloudflare()
+  adapter: cloudflare({
+      platformProxy: {
+    enabled: true,
+    configPath: 'wrangler.toml'
+  }
+  }
+  ),
 });
