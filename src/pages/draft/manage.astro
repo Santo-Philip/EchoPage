@@ -40,7 +40,7 @@ const domain = Astro.url.origin;
     <p class="text-sm text-text-secondary">
       From here you can manage and update your draft.
     </p>
-    <ThumbnailUploader client:only initialUrl={data[0].thumb} />
+    <ThumbnailUploader client:load initialUrl={data[0].thumb} />
     <SeoPreview
       domain={domain}
       title={data[0].title || "Untitled"}
@@ -184,7 +184,7 @@ const domain = Astro.url.origin;
         Publish Settings
       </p>
       <div class="flex w-full mt-4 items-center justify-between">
-        <PostScheduler id={id} client:only/>
+        <PostScheduler id={id} client:load/>
       </div> : 
       <p
         class="border-left font-bold border-l-4 w-full p-2 mt-4 bg-red-500/30 border-red-500"
