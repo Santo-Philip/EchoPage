@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "flare": "astro build && wrangler pages dev ./dist",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

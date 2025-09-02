@@ -8,15 +8,29 @@ export default defineConfig({
   output: "server",
 
   vite: {
+    build: {
+      minify: false,
+    },
+    ssr: {
+      external: [
+        "child_process",
+        "fs",
+        "os",
+        "node:crypto",
+        "node:path",
+        "node:url",
+        "node:fs/promises",
+      ],
+    },
     plugins: [tailwindcss()],
   },
 
   integrations: [react()],
   adapter: cloudflare({
-      platformProxy: {
-    enabled: true,
-    configPath: 'wrangler.toml'
-  }
-  }
-  ),
+    imageService: "cloudflare",
+    platformProxy: {
+      enabled: true,
+      configPath: "wrangler.toml",
+    },
+  }),
 });
