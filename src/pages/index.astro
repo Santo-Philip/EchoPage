@@ -1,7 +1,121 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import FAQ from '@/components/home/FAQ.astro';
+import Layout from '@/layouts/Layout.astro';
+import { iconMap } from '@/lib/blogs/icons';
+import { supabase } from '@/lib/supabase';
+
+const [categories, latestPosts, featuredPosts] = await Promise.all([
+  supabase.from('categories').select('*').then(res => res.data),
+  supabase.from('draft').select('*').order('created_at', { ascending: false }).limit(5).then(res => res.data),
+  supabase.from('draft').select('*').order('created_at', { ascending: true }).then(res => res.data)
+]);
+
+const Icon = iconMap[categories?.[0]?.icon];
+
 ---
 
-<Layout>
-	
+<Layout title="Tech Insights Blog" description="Explore articles, tutorials, and insights in modern web development.">
+  <section class="relative magicpattern py-40 px-6 text-center overflow-hidden">
+    <div class="relative z-10 max-w-4xl mx-auto">
+      <p class="md:text-7xl text-5xl text-white font-extrabold mb-6 tracking-tight animate-slideInUp">Something New for Every Second</p>
+      <p class="text-xl md:text-2xl text-white mb-10 font-light leading-relaxed animate-slideInUp delay-150">
+        Where curiosity meets expertise
+      </p>
+      <a href="#latest" class="inline-block bg-indigo-500 text-white font-medium px-8 py-4 rounded-full shadow-lg hover:bg-indigo-400 hover:shadow-xl transition-all duration-300 ease-in-out animate-slideInUp delay-300">
+        Explore Now
+      </a>
+    </div>
+    <div class="absolute inset-0 opacity-30">
+      <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 1440 320">
+        <path fill="#ffffff" fill-opacity="0.1" d="M0,128L60,138.7C120,149,240,171,360,176C480,181,600,171,720,149.3C840,128,960,96,1080,106.7C1200,117,1320,171,1380,197.3L1440,224L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path>
+      </svg>
+    </div>
+  </section>
+
+  <section class="container mx-auto py-20 px-6">
+    <h1 class="text-4xl md:text-5xl font-serif font-bold mb-16 text-center">Featured Stories</h1>
+    <div class="grid md:grid-cols-2 gap-12">
+      {featuredPosts?.map((post) => (
+        <article
+          class="relative overflow-hidden rounded-2xl shadow-xl group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+        >
+          <img src={post.thumb} alt={post.title} class="w-full h-96 object-cover transition-transform duration-700 group-hover:scale-110"/>
+          <div class="absolute inset-0 bg-gray-900/80 group-hover:bg-gray-900/70 transition-opacity duration-300"></div>
+          <div class="absolute bottom-8 left-8 right-8 text-white z-10">
+            <h3 class="text-3xl font-serif text-white font-semibold mb-3">{post.title}</h3>
+            <p class="text-base font-light max-w-md leading-relaxed">{post.desc}</p>
+            <a href={`/b/${post.category}/${post.slug}`} class="inline-block mt-6 text-indigo-300 font-medium hover:text-indigo-200 transition-colors duration-200">
+              Read More →
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section id="latest" class="bg-bg-secondary py-20 px-6">
+    <h2 class="text-4xl md:text-5xl font-serif font-bold mb-16 text-center ">Latest Articles</h2>
+    <div class="grid md:grid-cols-3 gap-10">
+      {latestPosts?.map((post) => (
+        <article
+          class="bg-bg-primary rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+        >
+          <img src={post.thumb} alt={post.title} class="w-full h-56 object-cover"/>
+          <div class="p-8">
+            <h3 class="text-2xl font-serif font-semibold mb-3 text-gray-900">{post.title}</h3>
+            <p class="text-gray-600 mb-6 leading-relaxed">{post.description}</p>
+            <a href={`/b/${post.category}/${post.slug}`} class="text-indigo-600 font-medium hover:text-indigo-500 transition-colors duration-200">
+              Read More →
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+<section class="py-12 px-4 sm:px-6 lg:px-8">
+  <h2 class="text-2xl sm:text-3xl font-semibold text-center mb-8 text-gray-800 tracking-tight">
+    Explore Categories
+  </h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+    {categories?.map((category) => (
+      <a
+        href={`/b/${category.slug}`}
+        class="group flex flex-col items-center p-4 rounded-xl bg-bg-secondary border border-text-muted transition-all duration-500 ease-in-out transform hover:-translate-y-1"
+      >
+        {category.icon && (
+          <div>
+              {Icon && <Icon/>}
+              </div>
+        )}
+        <span class="text-base font-medium text-text-secondary">
+          {category.title}
+        </span>
+      </a>
+    ))}
+  </div>
+  <FAQ />
+</section>
+
 </Layout>
+
+<style>
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slideInUp {
+    animation: slideInUp 0.8s ease-out forwards;
+  }
+  .delay-150 {
+    animation-delay: 150ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+</style>

@@ -18,6 +18,7 @@ interface EditorConfigProps {
 
 export function getEditorConfig({ setShow, setRange, setCoords }: EditorConfigProps) {
   return {
+    immediatelyRender: false,
     extensions: [
       Image.configure({
         allowBase64: true,

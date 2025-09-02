@@ -1,29 +1,27 @@
 ---
 import { supabase } from "@/lib/supabase";
 
-
 const {data, error} = await supabase.from("categories").select("*");
 
 if (!data) {
     return;
 }
 const categories = data.map((cat) => cat.title);
+const slug = data.map((cat) => cat.slug);
 
 const { selectedCategory = null } = Astro.props;
 ---
 
-<div id="category-selector" class="flex flex-wrap gap-2">
+<div id="category-selector" class="category-selector">
   {categories.map((cat) => {
     const isSelected = selectedCategory === cat;
     return (
       <button
         type="button"
-        class={`px-4 py-2 rounded-full border transition ${
-          isSelected
-            ? "bg-blue-600 text-white border-blue-600"
-            : "text-text-muted border-text-muted"
-        }`}
-        data-category={cat}
+        class={`category-button ${isSelected ? 'selected' : ''}`}
+        data-category={slug[categories.indexOf(cat)]}
+        aria-pressed={isSelected}
+        aria-label={`Select category ${cat}`}
       >
         {cat}
       </button>
@@ -39,19 +37,106 @@ const { selectedCategory = null } = Astro.props;
 
   buttons?.forEach((btn) => {
     btn.addEventListener("click", () => {
-      buttons.forEach((b) =>
-        b.classList.remove("bg-blue-600", "text-white", "border-blue-600")
-      );
-      buttons.forEach((b) =>
-        b.classList.add("text-text-muted", "border-text-muted")
-      );
-      btn.classList.remove("text-text-muted", "border-text-muted");
-      btn.classList.add("bg-blue-600", "text-white", "border-blue-600");
+      buttons.forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
       selected = btn.dataset.category;
       const event = new CustomEvent("categoryChange", {
         detail: { category: selected },
+        bubbles: true
       });
       document.dispatchEvent(event);
     });
   });
 </script>
+
+<style>
+  .category-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af #f3f4f6;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+  }
+
+  .category-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+  }
+
+  .category-button:hover {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #2563eb;
+  }
+
+  .category-button.selected {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .category-button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  /* Accessibility: Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .category-button {
+      transition: none;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .category-selector {
+      background-color: #1f2937;
+      scrollbar-color: #6b7280 #374151;
+    }
+
+    .category-button {
+      background-color: #374151;
+      color: #e5e7eb;
+      border-color: #4b5563;
+    }
+
+    .category-button:hover {
+      background-color: #4b5563;
+      border-color: #60a5fa;
+      color: #93c5fd;
+    }
+
+    .category-button.selected {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+
+    .category-button:focus-visible {
+      outline-color: #60a5fa;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    .category-button {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>

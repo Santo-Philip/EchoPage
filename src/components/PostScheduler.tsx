@@ -15,31 +15,35 @@ const PostScheduler: React.FC<Props> = ({ id }: Props) => {
   const buttonText = isScheduled ? "Schedule" : "Publish";
 
   const handleSubmit = () => {
-    if (selectedDate && selectedTime) {
-      const combined = new Date(
-        selectedDate.getFullYear(),
-        selectedDate.getMonth(),
-        selectedDate.getDate(),
-        selectedTime.getHours(),
-        selectedTime.getMinutes()
-      );
+  let scheduleIso: string;
 
-      const isoString = combined.toISOString();
+  if (selectedDate && selectedTime) {
+    const combined = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      selectedTime.getHours(),
+      selectedTime.getMinutes()
+    );
 
-      console.log(id);
-      autoSave(id, { schedule: isoString, status: "pending" });
+    // For timestamptz, just use ISO string (UTC)
+    scheduleIso = combined.toISOString();
 
-      window.showToast(`Post Scheduled at ${combined.toLocaleString()}`);
-      window.location.href = "/a/dashboard";
-    } else {
-      const nowIso = new Date().toISOString();
-      console.log(id);
-      autoSave(id, { status: "pending", schedule: nowIso });
+    autoSave(id, { schedule: scheduleIso, status: "pending" });
 
-      window.showToast("Post will be public after review");
-      window.location.href = "/a/dashboard";
-    }
-  };
+    window.showToast(`Post Scheduled at ${combined.toLocaleString()}`);
+    window.location.href = "/a/dashboard";
+  } else {
+    const now = new Date();
+    scheduleIso = now.toISOString();
+
+    autoSave(id, { status: "pending", schedule: scheduleIso });
+
+    window.showToast("Post will be public after review");
+    window.location.href = "/a/dashboard";
+  }
+};
+
 
   return (
     <div className="flex flex-col gap-4 w-full p-4 rounded shadow">

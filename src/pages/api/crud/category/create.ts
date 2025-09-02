@@ -36,9 +36,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
             status: 500,
           })
     }
-    return redirect("/dashboard");
+    return redirect("/a/category?success=true");
   } catch (error) {}
-  return new Response(JSON.stringify({ error: "Something went wrong" }), {
-    status: 500,
-  });
+  return redirect("/a/category?error=true")
 };

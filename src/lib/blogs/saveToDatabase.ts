@@ -8,7 +8,7 @@ export interface DraftContent {
   content_html? : string;
   slug?: string;
   lang?: string;
-  status?: "draft" | "public" | "pending" | "archived";
+  status?: "draft" | "public" | "pending" | "archived" | "reject";
   updated_at?: string;
   tags?: string[];
   category?: string;

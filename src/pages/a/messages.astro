@@ -1,0 +1,111 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+
+const emails: string[] = import.meta.env.EMAIL.split(",");
+const user = await supabase.auth.getUser();
+if (!user.data.user?.id || !emails.includes(user.data.user?.email || "")) {
+  return Astro.redirect("/");
+}
+
+const pageSize = 5;
+const currentPage = Number(Astro.url.searchParams.get("page") || 1);
+const from = (currentPage - 1) * pageSize;
+const to = from + pageSize - 1;
+
+const { data, error, count } = await supabase
+  .from("messages")
+  .select("*", { count: "exact" })
+  .order("created_at", { ascending: false })
+  .range(from, to);
+
+const totalPages = count ? Math.ceil(count / pageSize) : 1;
+
+const successMsg = Astro.url.searchParams.get("success");
+const errorMsg = Astro.url.searchParams.get("error");
+---
+
+<Layout title="Messages" desc="View messages">
+  <div class="max-w-screen-md mx-auto p-6 min-h-screen space-y-6">
+    <div class="w-full rounded">
+      <h1 class="text-text-primary flex gap-4 items-center font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-heart">
+          <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/>
+          <path d="M7.828 13.07A3 3 0 0 1 12 8.764a3 3 0 0 1 5.004 2.224 3 3 0 0 1-.832 2.083l-3.447 3.62a1 1 0 0 1-1.45-.001z"/>
+        </svg>
+        Messages
+      </h1>
+      <p class="text-text-secondary">View messages sent via the contact form</p>
+    </div>
+
+    {successMsg && (
+      <div class="p-4 border border-green-300 bg-green-50 text-green-700 rounded">
+        <p class="font-medium">{successMsg}</p>
+      </div>
+    )}
+    {errorMsg && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">{errorMsg}</p>
+      </div>
+    )}
+
+    {error && (
+      <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
+        <p class="font-medium">Error loading messages</p>
+        <p class="text-sm">{error.message}</p>
+      </div>
+    )}
+
+    {data && data.length > 0 ? (
+      <div class="space-y-4">
+        {data.map((message) => (
+          <div
+            class="border border-text-muted rounded-2xl shadow-sm p-4"
+            id={message.id}
+          >
+            <h2 class="font-medium text-lg mb-2">
+              {message.name || "No Name"}
+            </h2>
+            <p class="text-text-secondary mb-2">
+              {message.email || "No Email"}
+            </p>
+            <div class="prose prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
+              <p>{message.msg || "No Message"}</p>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">
+              Sent on: {new Date(message.created_at).toLocaleString()}
+            </p>
+            <form action="/api/crud/messages/delete" method="post">
+              <input type="hidden" name="id" value={message.id} />
+              <button
+                type="submit"
+                class="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm shadow transition"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-500">No messages found.</p>
+    )}
+
+    {totalPages > 1 && (
+      <div class="flex justify-center gap-2 mt-6">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <a
+            href={`?page=${page}`}
+            class={`px-3 py-1 rounded ${
+              page === currentPage
+                ? "bg-blue-500 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
+          >
+            {page}
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

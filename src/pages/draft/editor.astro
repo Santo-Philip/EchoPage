@@ -90,8 +90,8 @@ if (id) {
     <p class="text-sm text-text-secondary p-2">
       This is the editor page where you can create and edit content.
     </p>
-    <ThumbnailUploader client:only initialUrl={thumb} />
-    <EditorPage client:only savedContent={content} />
+    <ThumbnailUploader client:load initialUrl={thumb} />
+    <EditorPage client:load savedContent={content} />
 
   </div>
 </Layout>

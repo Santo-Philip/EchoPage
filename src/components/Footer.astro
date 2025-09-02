@@ -20,6 +20,7 @@
       <li><a href="/contact" class="hover:underline">Contact</a></li>
       <li><a href="/privacy" class="hover:underline">Privacy Policy</a></li>
       <li><a href="/terms" class="hover:underline">Terms of Service</a></li>
+      <li><a href="https://github.com/Santo-Philip/EchoPage" class="hover:underline">Source Code</a></li>
     </ul>
 
     <p
@@ -32,6 +33,8 @@
 </footer>
 
 <script>
-  // @ts-ignore
-  document.getElementById("year").textContent = new Date().getFullYear();
+  const yearElement = document.getElementById("year");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear().toString();
+  }
 </script>
