@@ -1,5 +1,6 @@
 ---
 import { supabase } from "@/lib/supabase"
+import { Image } from "astro:assets";
 
 const topStories = await supabase.from("draft").select("*").eq("status", "public").order('created_at', { ascending: false }).limit(6).then(res => res.data);
 ---
@@ -10,7 +11,9 @@ const topStories = await supabase.from("draft").select("*").eq("status", "public
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {topStories.map((story) => (
         <a href={`/stories/${story.slug}`} class="group block rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-          <img 
+          <Image
+            width={400}
+            height={300}
             src={story.thumb} 
             alt={story.title} 
             class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" 

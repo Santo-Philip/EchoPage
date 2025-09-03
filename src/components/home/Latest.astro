@@ -1,5 +1,6 @@
 ---
 import { supabase } from "@/lib/supabase"
+import { Image } from "astro:assets";
 
 const { data: mainArticle } = await supabase
   .from("draft")
@@ -29,7 +30,9 @@ const { data: categories } = await supabase
         href={`/b/${mainArticle.category}/${mainArticle.slug}`} 
         class="relative group lg:col-span-5 rounded-xl overflow-hidden shadow-lg"
       >
-        <img 
+        <Image
+          width={800}
+          height={450}
           src={mainArticle.thumb} 
           alt={mainArticle.title} 
           class="w-full aspect-video lg:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
@@ -50,7 +53,9 @@ const { data: categories } = await supabase
             href={`/b/${article.category}/${article.slug}`} 
             class="flex gap-3 group rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition"
           >
-            <img 
+            <Image 
+              width={128}
+              height={80}
               src={article.thumb} 
               alt={article.title} 
               class="w-28 h-20 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300" 
