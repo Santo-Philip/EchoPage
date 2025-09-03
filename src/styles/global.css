@@ -84,6 +84,16 @@ font-weight: 700;
   pointer-events: none; 
 }
 
+.tiptap .youtube-embed {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 0.75rem; /* optional rounded corners */
+  margin: 1rem 0;
+}
+
+
 .tiptap{
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);

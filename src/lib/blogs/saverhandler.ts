@@ -8,7 +8,7 @@ export function handleAutoSave(editor: Editor) {
     const id = getSearchParam("id");
     const json = editor.getJSON();
     const html = editor.getHTML();
-    const { title, description } = extractTitleAndDescription(json);
+    const { title, description} = extractTitleAndDescription(json);
     autoSave(id, {
       content_json: JSON.stringify(json),
       content_html: html,

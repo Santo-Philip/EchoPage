@@ -4,6 +4,7 @@ import TopBar from "../components/TopBar.astro";
 import Footer from "../components/Footer.astro";
 import Toasts from "@/components/Toasts";
 import Loading from "@/components/Loading";
+import BreadCrumbs from "@/components/BreadCrumbs.astro";
 
 
 const cookies = Astro.cookies.get('theme')?.value ||  "light";
@@ -57,6 +58,7 @@ const {
     <div class="w-full h-12"></div>
     <Toasts client:load/>
     <Loading client:load/>
+    <BreadCrumbs/>
     <slot />
     <Footer/>
   </body>

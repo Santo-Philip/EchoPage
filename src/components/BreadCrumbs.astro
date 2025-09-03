@@ -1,0 +1,72 @@
+---
+const {
+  separator = "/",
+  ariaLabel = "Breadcrumb",
+  homeLabel = "Home",
+  class: className = "",
+} = Astro.props as {
+  separator?: string;
+  ariaLabel?: string;
+  homeLabel?: string;
+  class?: string;
+};
+
+// Get path segments from current URL (no filtering, keep all for href correctness)
+const { pathname } = Astro.url;
+const segments = pathname.split("/").filter(Boolean);
+
+// Build breadcrumb items
+let items: { href: string; label: string; hidden?: boolean }[] = [];
+let pathAcc = "";
+if (segments.length === 0) {
+  items = [{ href: "/", label: homeLabel }];
+} else {
+  items = [
+    { href: "/", label: homeLabel },
+    ...segments.map((seg) => {
+      pathAcc += "/" + seg;
+      return {
+        href: pathAcc,
+        label: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/[-_]/g, " "),
+        hidden: seg.length === 1, // mark one-char segments as hidden
+      };
+    }),
+  ];
+}
+
+const visibleItems = items.filter((item) => !item.hidden);
+const lastIndex = visibleItems.length - 1;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: items.map((item, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: item.label,
+    item: item.href,
+  })),
+};
+---
+<nav aria-label={ariaLabel} class={`flex py-2 px-2 md:px-8 lg:px-14 items-center gap-2 ${className}`.trim()}>
+  <ol class="flex flex-wrap items-center gap-2 text-sm">
+    {visibleItems.map((item, i) => {
+      const isLast = i === lastIndex;
+      return (
+        <li class="flex items-center gap-2">
+          {i > 0 && (
+            <span aria-hidden="true" class="opacity-60 select-none">{separator}</span>
+          )}
+          {isLast ? (
+            <span aria-current="page" class="font-medium underline-offset-2">{item.label}</span>
+          ) : (
+            <a href={item.href} class="hover:underline underline-offset-2 outline-none rounded">
+              {item.label}
+            </a>
+          )}
+        </li>
+      );
+    })}
+  </ol>
+  <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+</nav>
