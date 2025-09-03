@@ -1,0 +1,66 @@
+---
+import { supabase } from "@/lib/supabase"
+
+
+const { data: featured } = await supabase
+  .from("draft")
+  .select("*")
+  .eq("status", "public")
+  .order("created_at", { ascending: false })
+  .limit(1)
+  .single();
+
+let { data: sideArticles } = await supabase
+  .from("draft")
+  .select("*")
+  .eq("status", "public")
+  .order("created_at", { ascending: false })
+  .limit(4);
+
+if (featured) {
+    sideArticles = sideArticles?.filter((a: any) => a.id !== featured.id).slice(0, 3) || null;
+}
+---
+
+{featured && (
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 py-6">
+   
+    <a 
+      href={`/b/${featured.category}/${featured.slug}`} 
+      class="relative group md:col-span-2 rounded-xl overflow-hidden shadow-lg"
+    >
+      <img 
+        src={featured.thumb} 
+        alt={featured.title} 
+        class="w-full aspect-video md:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+        loading="lazy"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 flex flex-col justify-end">
+        <h2 class="text-2xl md:text-3xl font-bold text-white group-hover:text-blue-400 transition">
+          {featured.title}
+        </h2>
+      </div>
+    </a>
+
+    {sideArticles && sideArticles.length > 0 && (
+      <div class="flex flex-col gap-4">
+        {sideArticles.map((article) => (
+          <a 
+            href={`/b/${article.category}/${article.slug}`} 
+            class="flex gap-3 group rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+          >
+            <img 
+              src={article.thumb} 
+              alt={article.title} 
+              class="w-28 h-20 md:w-32 md:h-24 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300" 
+              loading="lazy"
+            />
+            <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-500 line-clamp-2">
+              {article.title}
+            </h3>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+)}

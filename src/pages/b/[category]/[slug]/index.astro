@@ -20,7 +20,7 @@ if (error || !post) {
 ---
 
 <Layout title={post[0]?.title || "Post"} keywords={post[0]?.keywords || post[0]?.slug} desc={post[0]?.desc || "Blog post"}>
-  <div class="max-w-screen-md mx-auto p-2 min-h-screen space-y-6">
+  <div class="max-w-screen-md mx-auto min-h-screen space-y-6">
     {error && (
       <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">
         <p class="font-medium">Error loading post</p>
@@ -29,10 +29,9 @@ if (error || !post) {
     )}
 
     {post && (
+      <img src={post[0]?.thumb} alt="thumbnail" class="aspect-video md:rounded-lg object-cover" />
       <article class="prose prose-p:leading-relaxed prose-video:aspect-video prose-img:rounded-lg prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
-        <h1 class="text-4xl font-serif font-bold text-text-primary">{post[0]?.title}</h1>
-        <img src={post[0]?.thumb} alt="thumbnail" class="aspect-video rounded-lg object-cover" />
-        <div class="mt-4" set:html={post[0]?.content_html}></div>
+        <div class="mt-4 p-2" set:html={post[0]?.content_html}></div>
       </article>
     )}
   </div>

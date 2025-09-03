@@ -89,6 +89,7 @@ const domain = Astro.url.origin;
         class="w-full justify-center items-center flex flex-wrap gap-4"
       >
       </div>
+      
       <p class="text-accent-primary text-sm p-2">Keywords</p>
       <div
         id="keywords"
@@ -97,10 +98,19 @@ const domain = Astro.url.origin;
       >
        {data[0]?.keywords?.map((keyword : string) => keyword + ', ').join('') || ''}
       </div>
+      
       <div
         id="keyword-suggestions"
         class="w-full justify-center items-center flex flex-wrap gap-4"
       >
+      </div>
+      <p class="text-accent-primary text-sm p-2">Slug</p>
+      <div
+        id="slug"
+        contenteditable="true"
+        class="w-full min-h-12 outline-none border-b border-text-muted p-2"
+      >
+       {data[0]?.slug}
       </div>
       <p class="text-accent-primary text-sm p-2">Category</p>
     </div>
@@ -209,11 +219,19 @@ const domain = Astro.url.origin;
       import aiClient from "@/lib/aiClient";
       import autoSave from "@/lib/blogs/autosave";
       import { getSearchParam } from "@/lib/blogs/getParams";
+import slugify from "@/lib/blogs/slug";
 
       const title = document.getElementById("title") as HTMLDivElement;
       const desc = document.getElementById("desc") as HTMLDivElement;
       const tags = document.getElementById("tags") as HTMLDivElement;
       const keywords = document.getElementById("keywords") as HTMLDivElement;
+      const slug = document.getElementById("slug") as HTMLDivElement;
+
+      slug.addEventListener("input", async () => {
+        const val = await slugify(slug.innerText);
+        autoSave(getSearchParam("id"), { slug: val });
+      });
+
       const archive = document.getElementById(
         "archivebtn"
       ) as HTMLButtonElement;

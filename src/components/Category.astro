@@ -13,20 +13,21 @@ const { selectedCategory = null } = Astro.props;
 ---
 
 <div id="category-selector" class="category-selector">
-  {categories.map((cat) => {
-    const isSelected = selectedCategory === cat;
-    return (
-      <button
-        type="button"
-        class={`category-button ${isSelected ? 'selected' : ''}`}
-        data-category={slug[categories.indexOf(cat)]}
-        aria-pressed={isSelected}
-        aria-label={`Select category ${cat}`}
-      >
-        {cat}
-      </button>
-    );
-  })}
+{data.map((cat) => {
+  const isSelected = selectedCategory === cat.slug;
+  return (
+    <button
+      type="button"
+      class={`category-button ${isSelected ? 'selected' : ''}`}
+      data-category={cat.slug}
+      aria-pressed={isSelected}
+      aria-label={`Select category ${cat.title}`}
+    >
+      {cat.title}
+    </button>
+  );
+})}
+
 </div>
 
 <script>
@@ -95,14 +96,12 @@ const { selectedCategory = null } = Astro.props;
     outline-offset: 2px;
   }
 
-  /* Accessibility: Reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     .category-button {
       transition: none;
     }
   }
 
-  /* Dark mode support */
   @media (prefers-color-scheme: dark) {
     .category-selector {
       background-color: #1f2937;
@@ -132,7 +131,6 @@ const { selectedCategory = null } = Astro.props;
     }
   }
 
-  /* Responsive adjustments */
   @media (max-width: 640px) {
     .category-button {
       padding: 0.5rem 0.75rem;
