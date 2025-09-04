@@ -1,6 +1,7 @@
 ---
 import { supabase } from "@/lib/supabase"
 import { Image } from 'astro:assets';
+import OptimizedImage from "./OptimizedImage.astro";
 
 const { data: featured } = await supabase
   .from("draft")
@@ -29,13 +30,10 @@ if (featured) {
       href={`/b/${featured.category}/${featured.slug}`} 
       class="relative group md:col-span-2 rounded-xl overflow-hidden shadow-lg"
     >
-      <Image
-      width={800}
-      height={450}
+      <OptimizedImage
         src={featured.thumb} 
         alt={featured.slug} 
         class="w-full aspect-video md:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-        loading="lazy"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 flex flex-col justify-end">
         <h2 class="text-2xl md:text-3xl font-bold text-white group-hover:text-blue-400 transition">
@@ -51,13 +49,10 @@ if (featured) {
             href={`/b/${article.category}/${article.slug}`} 
             class="flex gap-3 group rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition"
           >
-            <Image
-              width={128}
-              height={80}
+            <OptimizedImage
               src={article.thumb} 
               alt={article.slug} 
               class="w-28 h-20 md:w-32 md:h-24 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300" 
-              loading="lazy"
             />
             <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-500 line-clamp-2">
               {article.title}

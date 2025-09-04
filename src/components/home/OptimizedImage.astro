@@ -1,0 +1,73 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+}
+
+const { src, alt, class: className = "" } = Astro.props;
+---
+
+<picture>
+  <img
+    src="/download.png"
+    data-src={src}
+    alt={alt}
+    class={`optimized-img ${className}`}
+    loading="lazy"
+    decoding="async"
+  />
+</picture>
+
+<style>
+  .optimized-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    filter: blur(20px);
+  }
+
+  .optimized-img.loaded {
+    filter: blur(0);
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const imgs = document.querySelectorAll<HTMLImageElement>("img.optimized-img");
+
+  const onLoad = (img: HTMLImageElement) => {
+    const fullSrc = img.dataset.src;
+    if (!fullSrc) return;
+
+    const highRes = new Image();
+    highRes.src = fullSrc;
+
+    highRes.onload = () => {
+      img.src = fullSrc;
+      img.classList.add("loaded");
+    };
+  };
+
+  imgs.forEach((img) => {
+    if ("loading" in HTMLImageElement.prototype) {
+      if (img.loading === "lazy") {
+        const observer = new IntersectionObserver((entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              onLoad(img);
+              obs.unobserve(entry.target);
+            }
+          });
+        });
+        observer.observe(img);
+      } else {
+        onLoad(img);
+      }
+    } else {
+      onLoad(img);
+    }
+  });
+</script>
