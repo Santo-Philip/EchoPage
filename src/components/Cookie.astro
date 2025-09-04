@@ -1,0 +1,85 @@
+<div id="cookie-banner" class="cookie-banner hidden">
+  <p>We use cookies to improve your experience. By continuing to use this site, you accept our use of cookies.</p>
+  <button id="accept-cookies">Accept</button>
+</div>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90%;
+    width: 400px;
+    background: #1f2937; /* dark gray */
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    z-index: 50;
+  }
+
+  /* Start hidden */
+  .hidden {
+    display: none;
+  }
+
+  /* Animate when closing */
+  .closing {
+    animation: slideOut 0.3s ease forwards;
+  }
+
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, 20px);
+    }
+  }
+
+  .cookie-banner button {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+  }
+
+  .cookie-banner button:hover {
+    background: #2563eb;
+  }
+</style>
+
+<script>
+  const banner = document.getElementById("cookie-banner");
+  const acceptBtn = document.getElementById("accept-cookies");
+
+  // Show immediately if not accepted
+  if (!localStorage.getItem("cookiesAccepted")) {
+    banner.classList.remove("hidden");
+  }
+
+  acceptBtn?.addEventListener("click", () => {
+    // Play closing animation
+    banner.classList.add("closing");
+
+    // Wait for animation to finish, then hide + save
+    banner.addEventListener("animationend", () => {
+      banner.classList.add("hidden");
+      banner.classList.remove("closing");
+    }, { once: true });
+
+    localStorage.setItem("cookiesAccepted", "true");
+  });
+</script>
