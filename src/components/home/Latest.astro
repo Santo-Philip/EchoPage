@@ -34,7 +34,7 @@ const { data: categories } = await supabase
           width={800}
           height={450}
           src={mainArticle.thumb} 
-          alt={mainArticle.title} 
+          alt={mainArticle.slug} 
           class="w-full aspect-video lg:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
           loading="lazy"
         />
@@ -57,7 +57,7 @@ const { data: categories } = await supabase
               width={128}
               height={80}
               src={article.thumb} 
-              alt={article.title} 
+              alt={article.slug} 
               class="w-28 h-20 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300" 
               loading="lazy"
             />
