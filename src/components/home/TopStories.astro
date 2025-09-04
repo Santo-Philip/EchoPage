@@ -6,22 +6,22 @@ const topStories = await supabase.from("draft").select("*").eq("status", "public
 ---
 {topStories && topStories.length > 0 && (
   <section class="py-8">
-    <h1 class="text-2xl font-bold mb-6">Top Stories</h1>
+    <h1 class="py-4">Top Stories</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {topStories.map((story) => (
-        <a href={`/stories/${story.slug}`} class="group block rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+        <a href={`/b/${story.category}/${story.slug}`} class="group block rounded-xl overflow-hidden shadow hover:shadow-lg transition">
           <OptimizedImage
             src={story.thumb} 
             alt={story.slug} 
-            class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" 
+            class="w-full h-48 object-cover group-hover:img-scale" 
           />
-          <div class="p-4 bg-white dark:bg-gray-800">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-600 transition">
+          <div class="p-4 bg-bg-secondary">
+            <h3 class="text-lg font-semibold text-text-primary">
               {story.title}
             </h3>
             {story.desc && (
-              <p class="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+              <p class="mt-2 text-sm text-text-secondary line-clamp-3">
                 {story.desc}
               </p>
             )}
@@ -31,3 +31,9 @@ const topStories = await supabase.from("draft").select("*").eq("status", "public
     </div>
   </section>
 )}
+
+<style>
+    h1,h2,h3,p {
+        text-align: start;
+    }
+</style>

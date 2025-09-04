@@ -1,6 +1,5 @@
 ---
 import { supabase } from "@/lib/supabase"
-import { Image } from 'astro:assets';
 import OptimizedImage from "./OptimizedImage.astro";
 
 const { data: featured } = await supabase
@@ -28,15 +27,15 @@ if (featured) {
    
     <a 
       href={`/b/${featured.category}/${featured.slug}`} 
-      class="relative group md:col-span-2 rounded-xl overflow-hidden shadow-lg"
+      class="relative md:col-span-2 rounded-xl img-scale overflow-hidden shadow-lg"
     >
       <OptimizedImage
         src={featured.thumb} 
         alt={featured.slug} 
-        class="w-full aspect-video md:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+        class="w-full aspect-video md:h-full object-cover" 
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 flex flex-col justify-end">
-        <h2 class="text-2xl md:text-3xl font-bold text-white group-hover:text-blue-400 transition">
+      <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/70 via-bg-primary/40 to-transparent p-6 flex flex-col justify-end">
+        <h2 class="text-2xl md:text-3xl font-bold group-hover:text-blue-400 transition">
           {featured.title}
         </h2>
       </div>
@@ -47,19 +46,27 @@ if (featured) {
         {sideArticles.map((article) => (
           <a 
             href={`/b/${article.category}/${article.slug}`} 
-            class="flex gap-3 group rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+            class="flex gap-3 group rounded-lg overflow-hidden bg-bg-secondary items-center border border-text-muted shadow-2xl transition"
           >
             <OptimizedImage
               src={article.thumb} 
               alt={article.slug} 
-              class="aspect-square w-20 h-20 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300" 
+              class="aspect-video h-20 w-32 object-cover rounded-lg flex-shrink-0 " 
             />
-            <h3 class="text-sm md:text-base font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-500 line-clamp-2">
-              {article.title}
-            </h3>
+            <div>
+              <h3 class="line-clamp-2">
+                {article.title}
+              </h3>
+            </div>
           </a>
         ))}
       </div>
     )}
   </section>
 )}
+
+<style>
+    h1,h2,h3 {
+        text-align: start;
+    }
+</style>
