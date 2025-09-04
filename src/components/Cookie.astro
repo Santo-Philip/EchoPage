@@ -1,6 +1,6 @@
 <div id="cookie-banner" class="cookie-banner hidden">
   <p>We use cookies to improve your experience. By continuing to use this site, you accept our use of cookies.</p>
-  <button id="accept-cookies">Accept</button>
+  <button class="bg-bg-secondary cursor-pointer px-6 py-2 text-text-primary border border-accent-primary rounded-2xl" id="accept-cookies">Accept</button>
 </div>
 
 <style>
@@ -45,27 +45,14 @@
     }
   }
 
-  .cookie-banner button {
-    background: #3b82f6;
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.4rem 1rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out;
-  }
 
-  .cookie-banner button:hover {
-    background: #2563eb;
-  }
+
 </style>
 
 <script>
-  const banner = document.getElementById("cookie-banner");
-  const acceptBtn = document.getElementById("accept-cookies");
+  const banner = document.getElementById("cookie-banner") as HTMLDivElement;
+  const acceptBtn = document.getElementById("accept-cookies") as HTMLButtonElement;
 
-  // Show immediately if not accepted
   if (!localStorage.getItem("cookiesAccepted")) {
     banner.classList.remove("hidden");
   }
