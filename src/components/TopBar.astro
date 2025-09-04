@@ -26,7 +26,7 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
 <nav
   class="fixed z-50 flex top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 items-center justify-between"
 >
-  <a href="/" class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
+  <a href="/" aria-label="Home" class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
     <img src="/logo.png" alt="logo" height="40" width="40" />
     <h2>{import.meta.env.NAME}</h2>
   </a>
@@ -34,7 +34,7 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
     <div class="hidden md:flex items-center gap-4 text-text-primary">
       {
         urls.map((url) => (
-          <a href={url.href} class="hover:underline hover:text-accent-primary">
+          <a href={url.href} aria-label={url.label} class="hover:underline hover:text-accent-primary">
             {url.label}
           </a>
         ))
@@ -47,14 +47,14 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
       </div>
       {user?.id ? (
       <>
-        <a href="/a/dashboard" class="flex items-center border border-text-primary/40 md:pl-2 p-1 rounded-full gap-2 cursor-pointer">
+        <a href="/a/dashboard" aria-label="Dashboard" class="flex items-center border border-text-primary/40 md:pl-2 p-1 rounded-full gap-2 cursor-pointer">
          <span class="hidden md:inline font-semibold ">{displayName}</span>
           <img src={avatar} alt={displayName} class="rounded-full w-6 h-6"/>
          
         </a>
       </>
     ) : (
-      <a href="/api/auth/google" class="px-3 py-1 border border-gray-500 rounded-full flex items-center gap-2 hover:bg-text-primary/20">
+      <a href="/api/auth/google" aria-label="Login with Google" class="px-3 py-1 border border-gray-500 rounded-full flex items-center gap-2 hover:bg-text-primary/20">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
           <circle cx="12" cy="12" r="10"/>
           <circle cx="12" cy="10" r="3"/>
@@ -79,7 +79,7 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
       urls.map((url) => (
         <div class="flex items-center gap-4">
           <url.icon class="w-5 h-5" />
-          <a href={url.href} class="hover:underline hover:text-text-secondary">
+          <a href={url.href} aria-label={url.label} class="hover:underline hover:text-text-secondary">
             {url.label}
           </a>
         </div>
