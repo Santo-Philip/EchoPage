@@ -10,6 +10,7 @@ import {
   MoonStar,
   Sun,
 } from "@lucide/astro";
+import OptimizedImage from "./home/OptimizedImage.astro";
 
 const urls = [
   { href: "/terms", label: "Terms", icon: ReceiptText },
@@ -27,7 +28,7 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
   class="fixed z-50 flex top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 items-center justify-between"
 >
   <a href="/" aria-label="Home" class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
-    <img src="/logo.png" alt="logo" height="40" width="40" />
+    <OptimizedImage src="/logo.png" alt="logo" class="w-10 h-10 rounded-full" />
     <h2>{import.meta.env.NAME}</h2>
   </a>
   <div class="flex gap-4">
