@@ -3,10 +3,10 @@ import FAQ from '@/components/home/FAQ.astro';
 import Featured from '@/components/home/Featured.astro';
 import Latest from '@/components/home/Latest.astro';
 import TopStories from '@/components/home/TopStories.astro';
-import Layout from '@/layouts/Layout.astro';
+import HomeLayout from '@/layouts/HomeLayout.astro';
 ---
 
-<Layout title="Tech Insights Blog" description="Explore articles, tutorials, and insights in modern web development.">
+<HomeLayout title="Tech Insights Blog" description="Explore articles, tutorials, and insights in modern web development.">
   <section class="relative px-2 md:px-6 lg:px-14 text-center overflow-hidden">
    <Featured/>
    <TopStories/>
@@ -16,7 +16,7 @@ import Layout from '@/layouts/Layout.astro';
   <FAQ />
 </section>
 
-</Layout>
+</HomeLayout>
 
 <style>
   @keyframes slideInUp {
