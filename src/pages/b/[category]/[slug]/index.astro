@@ -1,4 +1,5 @@
 ---
+import OptimizedImage from "@/components/home/OptimizedImage.astro";
 import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
 
@@ -29,7 +30,7 @@ if (error || !post) {
     )}
 
     {post && (
-      <img src={post[0]?.thumb} alt="thumbnail" class="aspect-video md:rounded-lg object-cover" />
+      <OptimizedImage src={post[0]?.thumb}  alt="thumbnail" class="aspect-video md:rounded-lg object-cover" />
       <article class="prose prose-p:leading-relaxed prose-video:aspect-video prose-img:rounded-lg prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
         <div class="mt-4 p-2" set:html={post[0]?.content_html}></div>
       </article>
