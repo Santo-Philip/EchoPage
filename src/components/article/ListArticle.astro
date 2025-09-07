@@ -1,0 +1,37 @@
+---
+import { supabase } from "@/lib/supabase"
+import OptimizedImage from "../home/OptimizedImage.astro";
+
+const category = Astro.params.category;
+const {data ,  error} = await supabase.from('draft').select('*').eq('category', category).eq('status', 'public').order('created_at', { ascending: false }).limit(5);
+---
+
+<div class="article-list space-y-4 p-2">
+  {data?.length === 0 ? (
+    <p class="text-center text-gray-500 dark:text-gray-400">All caught up ✨</p>
+  ) : (
+    <>
+      <div id="articles-container" class="grid gap-4"></div>
+      <div id="skeletons" class=" grid gap-4">
+        {data?.map((article) => (
+          <div class="flex gap-3">
+            <OptimizedImage src={article.thumb} alt={article.title} class="w-28 h-20 object-cover rounded-md" />
+            <div class="flex-1 space-y-2">
+              <h3 class="text-sm font-semibold">{article.title}</h3>
+              <p class="text-sm line-clamp-3 text-text-secondary">{article.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      {error ? (
+        <p class="text-center text-red-500">Error loading articles.</p>
+      ) :       <a
+      href={`/b/${category}`}
+        id="load-more"
+        class="mx-auto block w-1/3 text-center rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition disabled:opacity-50"
+      >
+        View More
+      </a>}
+    </>
+  )}
+</div>

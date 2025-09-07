@@ -1,9 +1,9 @@
 ---
+import BreadCrumbs from "@/components/universal/BreadCrumbs.astro";
+import Footer from "@/components/universal/Footer.astro";
+import TopBar from "@/components/universal/TopBar.astro";
+import { Cookie } from "@lucide/astro";
 import "../styles/global.css";
-import TopBar from "../components/TopBar.astro";
-import Footer from "../components/Footer.astro";
-import BreadCrumbs from "@/components/BreadCrumbs.astro";
-import Cookie from "@/components/Cookie.astro";
 
 
 const cookies = Astro.cookies.get('theme')?.value ||  "light";
