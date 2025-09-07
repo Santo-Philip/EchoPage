@@ -1,7 +1,8 @@
 ---
 import { supabase } from "@/lib/supabase"
-import { Image } from "astro:assets";
 import OptimizedImage from "./OptimizedImage.astro";
+import { iconMap } from "@/lib/blogs/icons";
+import Icon from "node_modules/@lucide/astro/src/Icon.astro";
 
 const { data: mainArticle } = await supabase
   .from("draft")
@@ -21,20 +22,21 @@ let { data: smallArticles } = await supabase
 
 const { data: categories } = await supabase
   .from("categories").select("*");
+
 ---
 
 {(mainArticle || (smallArticles && smallArticles.length > 0)) && (
-    <h1>What's New</h1>
+    <h1 class="text-start">What's New</h1>
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 py-8">
-    {mainArticle && (
+    {mainArticle && ( 
       <a 
         href={`/b/${mainArticle.category}/${mainArticle.slug}`} 
-        class="relative group lg:col-span-5 rounded-xl overflow-hidden shadow-lg"
+        class="relative text-start group lg:col-span-5 rounded-xl overflow-hidden shadow-lg"
       >
         <OptimizedImage
           src={mainArticle.thumb} 
           alt={mainArticle.slug} 
-          class="w-full aspect-video lg:h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          class=" aspect-video" 
         />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-6 flex flex-col justify-end">
           <h2 class="text-xl md:text-2xl font-bold text-white group-hover:text-blue-400 transition">
@@ -49,19 +51,19 @@ const { data: categories } = await supabase
         {smallArticles.map((article) => (
           <a 
             href={`/b/${article.category}/${article.slug}`} 
-            class="flex gap-3 group rounded-lg overflow-hidden hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+            class="flex gap-3 text-start rounded-lg overflow-hidden transition"
           >
             <OptimizedImage
               src={article.thumb}
               alt={article.slug}
-              class="w-28 h-20 object-cover rounded-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300"
+              class="min-w-32 h-20"
             />
             <div>
-              <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200 group-hover:text-blue-500 line-clamp-2">
+              <h3 class="text-sm font-semibold text-text-primary  line-clamp-2">
                 {article.title}
               </h3>
               {article.desc && (
-                <p class="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                <p class="mt-1 text-xs text-text-secondary line-clamp-3 text-wrap">
                   {article.desc}
                 </p>
               )}
@@ -72,13 +74,15 @@ const { data: categories } = await supabase
     )}
 
     {categories && categories.length > 0 && (
-      <aside class="lg:col-span-2 bg-gray-50 dark:bg-gray-900 rounded-xl p-4 shadow-sm">
-        <h3 class="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">Categories</h3>
-        <ul class="space-y-2">
+      <aside class="text-start flex gap-4 flex-col w-full">
+        <h3>Categories</h3>
+        <ul>
           {categories.map((cat) => (
+            
             <li>
+              {iconMap[cat.icon] && <Icon name={cat.icon} class="text-text-primary" />}
               <a 
-                href={`/c/${cat.slug}`} 
+                href={`/b/${cat.slug}`} 
                 class="block text-sm text-gray-700 dark:text-gray-300 hover:text-blue-600 transition"
               >
                 {cat.title}

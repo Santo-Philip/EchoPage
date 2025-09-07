@@ -11,11 +11,8 @@ const {
   class?: string;
 };
 
-// Get path segments from current URL (no filtering, keep all for href correctness)
 const { pathname } = Astro.url;
 const segments = pathname.split("/").filter(Boolean);
-
-// Build breadcrumb items
 let items: { href: string; label: string; hidden?: boolean }[] = [];
 let pathAcc = "";
 if (segments.length === 0) {
@@ -28,7 +25,7 @@ if (segments.length === 0) {
       return {
         href: pathAcc,
         label: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/[-_]/g, " "),
-        hidden: seg.length === 1, // mark one-char segments as hidden
+        hidden: seg.length === 1,
       };
     }),
   ];
