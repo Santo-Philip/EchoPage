@@ -43,6 +43,58 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             >
               Heading 2
             </li>
+                        <li
+            className="px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer "
+              onClick={async () => {
+                window.showLoading(true);
+                const { from, to } = editor.state.selection;
+                const selectedText = editor.state.doc.textBetween(
+                  from,
+                  to,
+                  " "
+                );
+
+                if (!selectedText) {
+                  window.showToast("No text selected!");
+                  window.showLoading(false);
+                  return;
+                }
+
+                try {
+                  const trnslt = await aiClient({
+                    system:
+                      "You are a writing assistant for TipTap editor. Just return valid TipTap JSON, no explanations.Include minimum 100 words",
+                    prompt: `continue wrinting after this also include the following text: ${selectedText}`,
+                  });
+
+                  let parsed;
+                  try {
+                    parsed = JSON.parse(trnslt);
+                  } catch (err) {
+                    window.showToast(
+                      "Error: AI returned invalid JSON. Try again."
+                    );
+                    return;
+                  }
+                  if (
+                    parsed &&
+                    "content" in parsed &&
+                    Array.isArray(parsed.content)
+                  ) {
+                    editor.commands.insertContent(parsed.content);
+                  } else {
+                    editor.commands.insertContent(parsed);
+                  }
+                } catch (err) {
+                  console.error(err);
+                  window.showToast("Unexpected error while translating.");
+                } finally {
+                  window.showLoading(false);
+                }
+              }}
+            >
+              AI Continue
+            </li>
             <li
             className="px-3 py-1.5 text-sm hover:bg-bg-secondary/30 cursor-pointer "
               onClick={async () => {
@@ -101,6 +153,7 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
             >
               AI Translate
             </li>
+
             <li
               onClick={() => {
                 editor?.chain().focus().setParagraph().run();
