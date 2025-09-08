@@ -22,8 +22,8 @@ const SearchPreview: React.FC<SearchPreviewProps> = ({
   const displayDescription = truncate(description, 170);
 
   return (
-    <div className="flex flex-col justify-center items-center my-4  gap-6">
-        <p className="text-sm text-accent-primary">This is how search engine show this page</p>
+    <div className="flex flex-col items-center my-4 mx-2 gap-6">
+        <h2>Browser Preview</h2>
       <div className="max-w-xl min-w-md border rounded-lg p-4 bg-white shadow">
         <div className="text-sm text-gray-600">{url}</div>
         <div className="text-blue-700 text-lg font-semibold hover:underline cursor-pointer">
