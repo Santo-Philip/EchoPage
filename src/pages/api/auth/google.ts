@@ -11,6 +11,7 @@ export const GET: APIRoute = async ({ cookies, redirect, request }) => {
     },
     
   })
+
   if (error) throw error
 
   return redirect(data.url) 

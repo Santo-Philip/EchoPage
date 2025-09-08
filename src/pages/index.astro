@@ -1,4 +1,5 @@
 ---
+import FloatingInput from '@/components/article/FloatingInput.astro';
 import FAQ from '@/components/home/FAQ.astro';
 import Featured from '@/components/home/Featured.astro';
 import Latest from '@/components/home/Latest.astro';
@@ -11,6 +12,10 @@ import HomeLayout from '@/layouts/HomeLayout.astro';
    <Featured/>
    <TopStories/>
    <Latest/>
+   <form action="/api/ai/client" method="post">
+     <FloatingInput name="prompt" label="Ask a question" />
+     <button type="submit">Submit</button>
+   </form>
   </section>
 
   <FAQ />
