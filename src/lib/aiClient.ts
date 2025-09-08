@@ -14,9 +14,9 @@ export default async function aiClient(
   options: AiClientOptions,
   onToken?: (token: string) => void
 ): Promise<string> {
-  const ai = import.meta.env.PUBLIC_AI_API;
-  const key = import.meta.env.PUBLIC_AI_API_KEY;
 
+  const ai = await fetch('/api/ai/client').then(res => res.json()).then(data => data.api);
+  const key = await fetch('/api/ai/client').then(res => res.json()).then(data => data.key);
   const now = Date.now();
   const waitTime = Math.max(0, lastRequestTime + REQUEST_DELAY - now);
   if (waitTime > 0) {
