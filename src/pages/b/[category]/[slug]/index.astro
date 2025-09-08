@@ -3,6 +3,7 @@ import ListArticle from "@/components/article/ListArticle.astro";
 import OptimizedImage from "@/components/home/OptimizedImage.astro";
 import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
+import { Share, ThumbsDown, ThumbsUp } from "@lucide/astro";
 
 const slug = Astro.params.slug;
 const category = Astro.params.category;
@@ -31,8 +32,33 @@ if (error || post.length == null || post.length === 0) {
     )}
 
     {post && (
+
       <OptimizedImage src={post[0]?.thumb}  alt="thumbnail" class="aspect-video md:rounded-lg object-cover" />
+            
       <article class="prose prose-p:leading-relaxed prose-video:aspect-video prose-img:rounded-lg prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
+        <div class="flex p-2 flex-wrap justify-between items-center">
+        <p class="text-xs text-text-secondary">
+                {post[0]?.schedule
+                  ? new Date(post[0]?.schedule).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+      
+                    })
+                  : new Date(post[0]?.created_at).toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+    
+                    })}
+              </p>
+              <div class="flex justify-evenly gap-4">
+                <button class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsUp/></button>
+                <button class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsDown/></button>
+                <button class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><Share/></button>
+
+              </div>
+              </div>
         <div class="mt-4 p-2" set:html={post[0]?.content_html}></div>
       </article>
     )}

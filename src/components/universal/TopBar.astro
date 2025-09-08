@@ -18,16 +18,23 @@ const urls = [
   { href: "/contact", label: "Contact", icon: Headset },
   { href: "/about", label: "About", icon: Store },
 ];
-const { data: { user }, error } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error,
+} = await supabase.auth.getUser();
 
-const avatar = user?.user_metadata?.avatar_url || '/default-avatar.png';
-const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
+const avatar = user?.user_metadata?.avatar_url || "/default-avatar.png";
+const displayName = user?.user_metadata?.full_name || user?.email || "Guest";
 ---
 
 <nav
   class="fixed z-50 flex top-0 left-0 right-0 bg-bg-secondary drop-shadow-2xl h-12 py-2 px-2 md:px-6 lg:px-12 items-center justify-between"
 >
-  <a href="/" aria-label="Home" class="flex items-center gap-2 text-2xl font-semibold text-text-primary">
+  <a
+    href="/"
+    aria-label="Home"
+    class="flex items-center gap-2 text-2xl font-semibold text-text-primary"
+  >
     <OptimizedImage src="/logo.ico" alt="logo" class="w-10 h-10 rounded-full" />
     <h2>{import.meta.env.NAME}</h2>
   </a>
@@ -35,7 +42,11 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
     <div class="hidden md:flex items-center gap-4 text-text-primary">
       {
         urls.map((url) => (
-          <a href={url.href} aria-label={url.label} class="hover:underline hover:text-accent-primary">
+          <a
+            href={url.href}
+            aria-label={url.label}
+            class="hover:underline hover:text-accent-primary"
+          >
             {url.label}
           </a>
         ))
@@ -46,23 +57,47 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
         <Sun id="sun" class="hidden cursor-pointer hover:text-amber-500" />
         <MoonStar id="moon" class="cursor-pointer hover:text-accent-primary" />
       </div>
-      {user?.id ? (
-      <>
-        <a href="/a/dashboard" aria-label="Dashboard" class="flex items-center border border-text-primary/40 md:pl-2 p-1 rounded-full gap-2 cursor-pointer">
-         <span class="hidden md:inline font-semibold ">{displayName}</span>
-          <img src={avatar} alt={displayName} class="rounded-full w-6 h-6"/>
-         
-        </a>
-      </>
-    ) : (
-      <a href="/api/auth/google" aria-label="Login with Google" class="px-3 py-1 border border-gray-500 rounded-full flex items-center gap-2 hover:bg-text-primary/20">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
-          <circle cx="12" cy="12" r="10"/>
-          <circle cx="12" cy="10" r="3"/>
-          <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
-        </svg>
-      </a>
-    )}
+      {
+        user?.id ? (
+          <>
+            <a
+              href="/a/dashboard"
+              aria-label="Dashboard"
+              class="flex items-center border border-text-primary/40 md:pl-2 p-1 rounded-full gap-2 cursor-pointer"
+            >
+              <span class="hidden md:inline font-semibold ">{displayName}</span>
+              <img
+                src={avatar}
+                alt={displayName}
+                class="rounded-full w-6 h-6"
+              />
+            </a>
+          </>
+        ) : (
+          <a
+            href="/api/auth/google"
+            aria-label="Login with Google"
+            class="px-3 py-1 border border-gray-500 rounded-full flex items-center gap-2 hover:bg-text-primary/20"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-5 h-5"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="10" r="3" />
+              <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+            </svg>
+          </a>
+        )
+      }
       <div id="menu-btn" class="md:hidden">
         <Menu id="menu-icon" class="cursor-pointer" />
         <Minimize2 id="minimize" class="cursor-pointer hidden" />
@@ -73,14 +108,18 @@ const displayName = user?.user_metadata?.full_name || user?.email || 'Guest';
 
 <div
   id="menu"
-  class="fixed shadow-2xl top-0 left-0 right-0 bg-bg-secondary -translate-y-full transition-all duration-500 md:hidden px-4 py-2"
+  class="fixed z-50 shadow-2xl top-0 left-0 right-0 bg-bg-secondary -translate-y-full transition-all duration-500 md:hidden px-4 py-2"
 >
   <div class="text-text-primary flex flex-col gap-4">
     {
       urls.map((url) => (
         <div class="flex items-center gap-4">
           <url.icon class="w-5 h-5" />
-          <a href={url.href} aria-label={url.label} class="hover:underline hover:text-text-secondary">
+          <a
+            href={url.href}
+            aria-label={url.label}
+            class="hover:underline hover:text-text-secondary"
+          >
             {url.label}
           </a>
         </div>

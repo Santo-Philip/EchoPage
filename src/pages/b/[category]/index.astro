@@ -35,17 +35,17 @@ const Icon = iconMap[cat?.icon];
 ---
 
 <Layout
-  title={`${cat?.title || "Category"} Posts`}
+  title={`${cat?.title || "Category"}`}
   desc={`${cat?.description || ""}`}
 >
   <div class="max-w-screen-md mx-auto p-2">
-    <h2 class="text-2xl flex gap-4 font-bold items-center text-text-primary mb-2">
+    <h2 class="text-2xl flex gap-4 font-bold border-l-2 border-text-primary pl-3 py-2 items-center text-text-primary mb-2">
       {Icon && <Icon />}
-      {cat?.title || "Category"} Posts
+      {cat?.title || "Category"}
     </h2>
 
     {cat?.description && (
-      <p class="text-sm text-text-secondary border-l-2 border-text-primary pl-3 py-2 mb-6">
+      <p class="text-sm text-text-secondary mb-6">
         {cat.description}
       </p>
     )}
@@ -59,7 +59,7 @@ const Icon = iconMap[cat?.icon];
 
     {posts && posts.length > 0 ? (
       <>
-        <div class="grid gap-2 grid-cols-1 md:grid-cols-2">
+        <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
           {posts.map((post) => (
             <a
               href={`/b/${post.category}/${post.slug}`}
@@ -73,24 +73,10 @@ const Icon = iconMap[cat?.icon];
                 />
               )}
               <h3 class="font-semibold text-lg p-2">{post.title}</h3>
-              <p class="text-sm p-2 text-text-secondary ">
+              <p class="text-sm px-2 line-clamp-2 text-text-secondary ">
                 {post.desc || "No content available."}
               </p>
-              <p class="text-xs p-2 text-gray-500">
-                {post.schedule
-                  ? new Date(post.schedule).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-      
-                    })
-                  : new Date(post.created_at).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-    
-                    })}
-              </p>
+          
             </a>
           ))}
         </div>
