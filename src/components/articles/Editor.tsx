@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { SlashMenu } from "./SlashMenu";
 import { BubbleMenu } from "./BubbleMenu";
 import { getEditorConfig } from "@/lib/blogs/editorSetup";
 import {
@@ -19,15 +18,12 @@ interface EditorPageProps {
 }
 
 export default function EditorPage({ savedContent }: EditorPageProps) {
-  const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [coords, setCoords] = useState({ top: 0, bottom: 0, left: 0, right: 0 });
-  const [slashRange, setSlashRange] = useState({ from: 0, to: 0 });
   const [submitting, setSubmitting] = useState(false);
 
   const editor = useEditor({
-    ...getEditorConfig({ setShow: setShowSlashMenu, setRange: setSlashRange, setCoords }),
+    ...getEditorConfig(),
     content: savedContent || null,
   });
 
@@ -94,7 +90,6 @@ export default function EditorPage({ savedContent }: EditorPageProps) {
       {error && (
         <p className="text-red-500 text-sm mt-2 animate-pulse">{error}</p>
       )}
-      <SlashMenu show={showSlashMenu} coords={coords} editor={editor} range={slashRange} />
       <BubbleMenu editor={editor} />
     </div>
   );

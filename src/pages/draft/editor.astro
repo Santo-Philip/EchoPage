@@ -3,9 +3,11 @@ import { supabase } from "@/lib/supabase";
 import ThumbnailUploader from "@/components/articles/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
 import EditorPage from "@/components/articles/Editor";
+import langauges from "@/lib/languages";
+
 
 let id = Astro.url.searchParams.get("id");
-let tr = Astro.url.searchParams.get("tr");
+let tr = Astro.url.searchParams.get("lang");
 
 const { data: userData, error: userError } = await supabase.auth.getUser();
 const userId = userData.user?.id;
@@ -18,6 +20,7 @@ let content: JSON | null = null;
 if (!userId) {
   return Astro.redirect("/");
 }
+
 
 if (id) {
   const { data, error } = await supabase
@@ -39,7 +42,7 @@ if (id) {
 } else if (tr) {
   const { data: trData, error: trError } = await supabase
     .from("draft")
-    .select("title, desc, thumb, content_json")
+    .select("title, desc, thumb, content_json, category")
     .eq("id", tr);
 
   if (trError) {
@@ -52,6 +55,9 @@ if (id) {
     title: trData && trData.length > 0 ? `${trData[0].title}` : '',
     desc: trData && trData.length > 0 ? trData[0].desc : '',
     thumb: trData && trData.length > 0 ? trData[0].thumb : null,
+    lang : tr || 'en',
+    status: "draft",
+    category: trData && trData.length > 0 ? trData[0].category : null,
     content_json:
       trData && trData.length > 0 ? trData[0].content_json : null,
   };
@@ -90,6 +96,24 @@ if (id) {
     <p class="text-sm text-text-secondary p-2">
       This is the editor page where you can create and edit content.
     </p>
+  <select
+  id="language"
+  class="border bg-bg-secondary w-full outline-none border-text-muted rounded-xl my-4 p-2"
+  value={tr || ''}
+  onchange={`(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('lang', this.value);
+    window.location.search = params.toString();
+  })()`}
+>
+  <option value="">Select Language</option>
+  {Object.entries(langauges).map(([code, name]) => (
+    <option  value={code} selected={tr === code}>
+      {name}
+    </option>
+  ))}
+</select>
+
     <ThumbnailUploader client:load initialUrl={thumb} />
     <EditorPage client:load savedContent={content} />
 

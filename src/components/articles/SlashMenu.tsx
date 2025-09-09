@@ -8,10 +8,7 @@ import uploadFileToApi from "@/lib/blogs/uploadFile";
 import getLastTextNode from "@/lib/blogs/getLastText";
 
 interface SlashMenuProps {
-  show: boolean;
-  coords: { left: number; bottom: number };
   editor: Editor | null;
-  range: { from: number; to: number };
 }
 
 interface TipTapJSONNode {
@@ -22,10 +19,7 @@ interface TipTapJSONNode {
 }
 
 export const SlashMenu: React.FC<SlashMenuProps> = ({
-  show,
-  coords,
   editor,
-  range,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -490,7 +484,7 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
   ];
 
   useEffect(() => {
-    if (!show || !editor) return;
+    if (!editor) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowDown") {
@@ -501,7 +495,7 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
         setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        editor.chain().deleteRange(range).focus().run();
+        editor?.chain().focus().deleteRange({ from: 0, to: editor.state.selection.from }).run();
         items[activeIndex].onSelect();
       }
     };
@@ -510,27 +504,16 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [show, editor, activeIndex, range, items]);
-
-  if (!show) return null;
+  }, [ editor, activeIndex, items]);
 
   return (
-    <Tippy
-      visible={show}
-      interactive
-      placement="bottom-start"
-      appendTo={document.body}
-      getReferenceClientRect={() =>
-        new DOMRect(coords.left, coords.bottom, 0, 0)
-      }
-      render={() => (
-        <div className="bg-text-secondary border border-text-muted text-bg-primary rounded shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
+        <div className=" bg-bg-secondary rounded shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
           {items.map((item, i) => (
             <button
               key={i}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
-                editor?.chain().deleteRange(range).focus().run();
+                editor?.chain().focus().deleteRange({ from: 0, to: editor.state.selection.from }).run();
                 item.onSelect();
               }}
               onMouseEnter={() => setActiveIndex(i)}
@@ -545,8 +528,5 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
           ))}
         </div>
       )}
-    />
-  );
-};
 
 export default SlashMenu;

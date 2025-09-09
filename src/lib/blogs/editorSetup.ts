@@ -6,17 +6,11 @@ import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import Highlight from '@tiptap/extension-highlight';
 import { Placeholder } from '@tiptap/extensions';
-import { SlashCommand } from '@/lib/slashCommand';
 import { CaretPosition } from '@/lib/caretCoordination';
 import HardBreak from '@tiptap/extension-hard-break';
 
-interface EditorConfigProps {
-  setShow: (visible: boolean | ((prev: boolean) => boolean)) => void;
-  setRange: (range: { from: number; to: number }) => void;
-  setCoords: (coords: { top: number; bottom: number; left: number; right: number }) => void;
-}
 
-export function getEditorConfig({ setShow, setRange, setCoords }: EditorConfigProps) {
+export function getEditorConfig() {
   return {
     immediatelyRender: false,
     extensions: [
@@ -45,13 +39,6 @@ export function getEditorConfig({ setShow, setRange, setCoords }: EditorConfigPr
       }),
       Placeholder.configure({
         placeholder: 'Press \'/\' to open command menu, start typing here',
-      }),
-      SlashCommand.configure({
-        setShow,
-        setRange,
-      }),
-      CaretPosition.configure({
-        setCoords,
       }),
     ],
     editorProps: {
