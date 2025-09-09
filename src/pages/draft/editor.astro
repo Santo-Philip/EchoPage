@@ -1,8 +1,8 @@
 ---
 import { supabase } from "@/lib/supabase";
-import ThumbnailUploader from "@/components/articles/ThumbnailUploader";
+import ThumbnailUploader from "@/components/article/ThumbnailUploader";
 import Layout from "@/layouts/Layout.astro";
-import EditorPage from "@/components/articles/Editor";
+import EditorPage from "@/components/article/Editor";
 
 let id = Astro.url.searchParams.get("id");
 let tr = Astro.url.searchParams.get("tr");
