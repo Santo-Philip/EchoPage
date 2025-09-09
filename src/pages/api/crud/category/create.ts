@@ -27,7 +27,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   }
   try {
     const slug = await slugify(category.toString());
-    console.log(slug);
     const { error } = await supabase
       .from("categories")
       .insert({ title: category, description : desc, icon, slug : slug });
@@ -37,6 +36,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
           })
     }
     return redirect("/a/category?success=true");
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
   return redirect("/a/category?error=true")
 };

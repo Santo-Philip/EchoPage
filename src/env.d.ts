@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly EMAIL : string
   readonly AI_API : string
   readonly AI_API_KEY : string
+  readonly SITE : string
 }
 
 interface ImportMeta {

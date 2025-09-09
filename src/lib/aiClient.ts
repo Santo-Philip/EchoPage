@@ -14,9 +14,35 @@ export default async function aiClient(
   options: AiClientOptions,
   onToken?: (token: string) => void
 ): Promise<string> {
+  let api: string | undefined;
+  let key: string | undefined;
 
-  const ai = await fetch('/api/ai/client').then(res => res.json()).then(data => data.api);
-  const key = await fetch('/api/ai/client').then(res => res.json()).then(data => data.key);
+  try {
+    // Figure out base URL (only works server-side)
+    const baseUrl =
+      typeof window === "undefined"
+        ? import.meta.env.SITE || "http://localhost:4321"
+        : "";
+
+    const res = await fetch(`${baseUrl}/api/ai/client`);
+    if (res.ok) {
+      const data = await res.json();
+      api = data.api;
+      key = data.key;
+    }
+  } catch (err) {
+    console.warn("Could not fetch /api/ai/client, falling back to env vars", err);
+  }
+
+  // Fallback to env vars if not provided by API
+  if (!api) api = import.meta.env.AI_API;
+  if (!key) key = import.meta.env.AI_API_KEY;
+
+  if (!api || !key) {
+    throw new Error("AI API or key not configured.");
+  }
+
+  // Respect request delay (rate limiting)
   const now = Date.now();
   const waitTime = Math.max(0, lastRequestTime + REQUEST_DELAY - now);
   if (waitTime > 0) {
@@ -24,8 +50,8 @@ export default async function aiClient(
   }
   lastRequestTime = Date.now();
 
+  // Prepare messages
   const messages: { role: string; content: string }[] = [];
-
   if (options.system) {
     messages.push({ role: "system", content: options.system });
   }
@@ -40,11 +66,11 @@ export default async function aiClient(
     stream: options.stream ?? false,
   };
 
-  const res = await fetch(ai, {
+  const res = await fetch(api, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(key ? { Authorization: `Bearer ${key}` } : {}),
+      Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify(body),
   });
@@ -53,6 +79,7 @@ export default async function aiClient(
     throw new Error(`Request failed: ${res.status} ${res.statusText}`);
   }
 
+  // Non-streamed response
   if (!options.stream) {
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
@@ -62,6 +89,7 @@ export default async function aiClient(
     return content;
   }
 
+  // Streamed response
   if (!res.body) {
     throw new Error("No response body received for streaming");
   }
