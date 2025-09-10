@@ -73,4 +73,17 @@ if (error || post.length == null || post.length === 0) {
   frame?.setAttribute("width", "100%");
   frame?.setAttribute("height", "100%");
   frame?.setAttribute("style", "aspect-ratio:16/9");
+  
+  const share = document.getElementById("share");
+share?.addEventListener("click", async () => {
+  if (navigator.share) {
+      await navigator.share({
+  text: `${document.title}\n${window.location.href}`
+});
+  } else {
+    await navigator.clipboard.writeText(window.location.href);
+    alert("Link copied to clipboard!");
+  }
+});
+
 </script>

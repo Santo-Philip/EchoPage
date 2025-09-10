@@ -11,11 +11,13 @@ import Cookie from "@/components/universal/Cookie.astro";
 const cookies = Astro.cookies.get('theme')?.value ||  "light";
 const theme = cookies === 'dark' ? 'dark' : 'light';
 
+const LOGO = import.meta.env.LOGO || "/logo.ico";
+
 const {
   title = "Home",
   desc = "We are building the best blogging plpatform right here now!",
   keywords = "blog,EchoPage, EchoBlog, blogging, platform",
-  img = "/logo.png",
+  img = LOGO,
 } = Astro.props;
 ---
 
