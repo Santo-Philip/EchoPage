@@ -10,8 +10,8 @@ export const GET: APIRoute = async ({ request }) => {
       status: 405,
     });
   }
-
-  if (request.url.startsWith(site)) {
+  const origin = new URL(request.url).origin;
+  if (origin !== site) {
     return new Response(JSON.stringify({ error: "Invalid request" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
