@@ -3,6 +3,14 @@ import { supabase } from "@/lib/supabase";
 import type { APIRoute } from "astro";
 
 export const DELETE: APIRoute = async ({ request }) => {
+   const origin = new URL(request.url).origin;
+
+  if (origin !== import.meta.env.SITE) {
+    return new Response(JSON.stringify({ error: "Invalid request origin" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   try {
     const { url } = await request.json();
     const result = extractBucketAndPath(url);

@@ -5,6 +5,14 @@ import type { APIRoute } from "astro";
 export const PATCH: APIRoute = async ({ request, params }) => {
   const blogId = params.id;
   const email: string[] = import.meta.env.EMAIL.split(",");
+  const origin = new URL(request.url).origin;
+
+  if (origin !== import.meta.env.SITE) {
+    return new Response(JSON.stringify({ error: "Invalid request origin" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   const user = await supabase.auth.getUser();
   if (!user.data.user) {

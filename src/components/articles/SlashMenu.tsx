@@ -18,9 +18,7 @@ interface TipTapJSONNode {
   text?: string;
 }
 
-export const SlashMenu: React.FC<SlashMenuProps> = ({
-  editor,
-}) => {
+export const SlashMenu: React.FC<SlashMenuProps> = ({ editor }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const items = [
@@ -44,7 +42,7 @@ export const SlashMenu: React.FC<SlashMenuProps> = ({
       title: "AI Complete",
       onSelect: async () => {
         try {
-          window.showLoading(true, false)
+          window.showLoading(true, false);
           const lastText = getLastTextNode(editor?.getJSON());
           if (!lastText) {
             window.showToast(
@@ -93,7 +91,7 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
           console.log(err);
           window.showToast("AI Writing Failed");
         } finally {
-          window.showLoading(false)
+          window.showLoading(false);
         }
       },
     },
@@ -495,7 +493,15 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
         setActiveIndex((prev) => (prev - 1 + items.length) % items.length);
       } else if (e.key === "Enter") {
         e.preventDefault();
-        editor?.chain().focus().deleteRange({ from: 0, to: editor.state.selection.from }).run();
+ const from = editor?.state.selection.from || 0;
+
+            if (from > 0) {
+              editor
+                ?.chain()
+                .focus()
+                .deleteRange({ from: from - 1, to: from })
+                .run();
+            }
         items[activeIndex].onSelect();
       }
     };
@@ -504,29 +510,39 @@ You are an AI that outputs **only valid TipTap JSON nodes**.
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [ editor, activeIndex, items]);
+  }, [editor, activeIndex, items]);
 
   return (
-        <div className=" bg-bg-secondary rounded shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
-          {items.map((item, i) => (
-            <button
-              key={i}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                editor?.chain().focus().deleteRange({ from: 0, to: editor.state.selection.from }).run();
-                item.onSelect();
-              }}
-              onMouseEnter={() => setActiveIndex(i)}
-              className={`w-full flex gap-2 text-left px-2 py-1 cursor-pointer ${
-                i === activeIndex
-                  ? "bg-text-primary/40"
-                  : "hover:bg-text-primary/40"
-              }`}
-            >
-              {item.icon} {item.title}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className=" bg-bg-secondary rounded shadow-2xl w-48 max-h-64 overflow-y-auto z-50">
+      {items.map((item, i) => (
+        <button
+          key={i}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            const from = editor?.state.selection.from || 0;
+
+            if (from > 0) {
+              editor
+                ?.chain()
+                .focus()
+                .deleteRange({ from: from - 1, to: from })
+                .run();
+            }
+
+            item.onSelect();
+          }}
+          onMouseEnter={() => setActiveIndex(i)}
+          className={`w-full flex gap-2 text-left px-2 py-1 cursor-pointer ${
+            i === activeIndex
+              ? "bg-text-primary/40"
+              : "hover:bg-text-primary/40"
+          }`}
+        >
+          {item.icon} {item.title}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export default SlashMenu;
