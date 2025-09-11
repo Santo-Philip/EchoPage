@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly SITE : string;
   readonly LOGO : string;
   readonly ANON_SECRET : string;
+  readonly ADSENSE_ID : string;
 }
 
 interface ImportMeta {

@@ -51,8 +51,19 @@ const {
       href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair:wght@700&display=swap"
       rel="stylesheet"
     />
+    <meta name="google-adsense-account" content={import.meta.env.ADSENSE_ID} />
+    <script
+      async
+      custom-element="amp-auto-ads"
+      src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+    <script
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.ADSENSE_ID}`}
+      crossorigin="anonymous"></script>
   </head>
   <body>
+    <amp-auto-ads type="adsense" data-ad-client={import.meta.env.ADSENSE_ID}
+    ></amp-auto-ads>
     <TopBar />
     <div class="w-full h-12"></div>
     <Toasts client:load/>
