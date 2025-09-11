@@ -2,12 +2,12 @@ import { supabase } from "@/lib/supabase";
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async () => {
-  const { data: posts } = await supabase.from('draft').select('slug');
+  const { data: posts } = await supabase.from('draft').select('*').eq('is_published', true).order('updated_at', { ascending: false }).limit(1000);
   const site = import.meta.env.SITE 
-    
+
   const urls = posts?.map(
       (p) =>
-        `<url><loc>${site}/blog/${p.slug}</loc></url>`
+        `<url><loc>${site}/b/${p.category}/${p.slug}</loc></url>`
     )
     .join("");
 
