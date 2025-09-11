@@ -7,7 +7,8 @@ Allow: /
 Sitemap: ${sitemapURL.href}
 `;
 
-export const GET: APIRoute = ({ site }) => {
-  const sitemapURL = new URL('sitemap-index.xml', site);
+export const GET: APIRoute = () => {
+  const site = import.meta.env.SITE;
+  const sitemapURL = new URL('sitemap.xml', site);
   return new Response(getRobotsTxt(sitemapURL));
 };
