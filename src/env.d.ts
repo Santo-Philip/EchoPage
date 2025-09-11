@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly AI_API_KEY : string
   readonly SITE : string;
   readonly LOGO : string;
+  readonly ANON_SECRET : string;
 }
 
 interface ImportMeta {

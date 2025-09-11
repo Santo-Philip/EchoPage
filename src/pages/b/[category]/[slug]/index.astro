@@ -36,7 +36,7 @@ if (error || post.length == null || post.length === 0) {
 
       <OptimizedImage src={post[0]?.thumb}  alt="thumbnail" class="aspect-video md:rounded-lg object-cover" />
             
-      <article class="prose prose-p:leading-relaxed prose-video:aspect-video prose-img:rounded-lg prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
+      <article id={post[0]?.id} class="prose prose-p:leading-relaxed prose-video:aspect-video prose-img:rounded-lg prose-headings:text-text-primary prose-p:text-text-primary prose-a:text-accent-hover prose-a:underline prose-strong:text-text-primary flex flex-col prose-lg max-w-none prose-blue">
         <div class="flex p-2 flex-wrap justify-between items-center">
         <p class="text-xs text-text-secondary">
                 {post[0]?.schedule
@@ -54,8 +54,8 @@ if (error || post.length == null || post.length === 0) {
                     })}
               </p>
               <div class="flex justify-evenly gap-4">
-                <button class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsUp/></button>
-                <button class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsDown/></button>
+                <button id="like" class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsUp/></button>
+                <button id="dislike" class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><ThumbsDown/></button>
                 <button id="share" class="cursor-pointer hover:bg-text-primary hover:text-bg-primary rounded-full p-2"><Share/></button>
 
               </div>
@@ -75,6 +75,10 @@ if (error || post.length == null || post.length === 0) {
   frame?.setAttribute("style", "aspect-ratio:16/9");
   
   const share = document.getElementById("share");
+  const like = document.getElementById("like");
+  const dislike = document.getElementById("dislike");
+
+
 share?.addEventListener("click", async () => {
   if (navigator.share) {
       await navigator.share({
@@ -85,5 +89,77 @@ share?.addEventListener("click", async () => {
     alert("Link copied to clipboard!");
   }
 });
+ 
+const article = document.querySelector("article") as HTMLElement;
+
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        fetch("/api/crud/data/views", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ post: article.id }),
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  },
+  {
+    root: null,
+    threshold: 1.0,
+  }
+);
+
+observer.observe(article);
+
+
+like?.addEventListener("click", async () => {
+  const response = await fetch("/api/crud/data/likes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ post: article.id, type: "like" }),
+  });
+  if (response.ok) {
+    window.showToast("Liked!");
+    window.location.reload();
+  }
+});
+
+dislike?.addEventListener("click", async () => {
+  const response = await fetch("/api/crud/data/likes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ post: article.id, type: "dislike" }),
+  });
+  if (response.ok) {
+    window.showToast("Disliked!");
+    window.location.reload();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const like = document.getElementById("like");
+  const dislike = document.getElementById("dislike");
+
+  try {
+    const res = await fetch(`/api/crud/data/getLikes?id=${article.id}`);
+    const data = await res.json();
+    console.log(data.likes[0].type);
+
+    if (data && data.likes[0].post === article.id) {
+      if (data.likes[0].type === "like") {
+        like?.classList.add("bg-text-primary", "text-bg-primary");
+        like?.classList.remove("text-text-secondary");
+      } else if (data.likes[0].type === "dislike") {
+        dislike?.classList.add("bg-text-primary", "text-bg-primary");
+        dislike?.classList.remove("text-text-secondary");
+      }
+    }
+  } catch (err) {
+    console.error("Failed to fetch likes:", err);
+  }
+});
+
 
 </script>
