@@ -8,7 +8,7 @@ import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
   output: "server",
-  site : import.meta.env.SITE || 'http://localhost:4321',
+  site : import.meta.env.SITE,
   vite: {
     resolve: {
       // @ts-ignore
