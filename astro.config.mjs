@@ -1,12 +1,14 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from "@tailwindcss/vite";
 import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
+
+
 export default defineConfig({
   output: "server",
-
+  site : import.meta.env.SITE || 'http://localhost:4321',
   vite: {
     resolve: {
       // @ts-ignore
@@ -28,7 +30,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [react()],
+  integrations: [react(), sitemap()],
   adapter: cloudflare({
     imageService: "cloudflare",
     platformProxy: {
