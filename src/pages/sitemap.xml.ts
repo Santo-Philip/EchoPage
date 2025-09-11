@@ -21,17 +21,19 @@ export const GET: APIRoute = async () => {
   const urls = (posts || [])
     .map(
       (p) => `
-  <url>
-    <loc>${site}/b/${encodeURIComponent(p.category)}/${encodeURIComponent(p.slug)}</loc>
-    <lastmod>${new Date(p.updated_at).toISOString()}</lastmod>
-  </url>`
+<url>
+  <loc>${site}/b/${encodeURIComponent(p.category)}/${encodeURIComponent(
+        p.slug
+      )}</loc>
+  <lastmod>${new Date(p.updated_at).toISOString()}</lastmod>
+</url>`
     )
     .join("");
-
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
-</urlset>`;
+</urlset>`
+    .replace(/\n\s*/g, "");
 
   return new Response(xml, {
     headers: { "Content-Type": "application/xml" },
