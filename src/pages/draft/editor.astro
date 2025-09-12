@@ -100,11 +100,6 @@ if (id) {
   id="language"
   class="border bg-bg-secondary w-full outline-none border-text-muted rounded-xl my-4 p-2"
   value={tr || ''}
-  onchange={`(() => {
-    const params = new URLSearchParams(window.location.search);
-    params.set('lang', this.value);
-    window.location.search = params.toString();
-  })()`}
 >
   <option value="">Select Language</option>
   {Object.entries(langauges).map(([code, name]) => (
@@ -118,4 +113,23 @@ if (id) {
     <EditorPage client:load savedContent={content} />
 
   </div>
+
+  <script>
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
+
+    const languageSelect = document.getElementById('language') as HTMLSelectElement;
+    languageSelect?.addEventListener('change', (event) => {
+      const selectedLang = (event.target && (event.target as HTMLSelectElement).value) || '';
+      const params = new URLSearchParams(window.location.search);
+      if (selectedLang) {
+        params.set('lang', selectedLang);
+      } else {
+        params.delete('lang');
+      }
+      const id = getSearchParam('id');
+      autoSave(id, { lang: selectedLang })
+      window.location.search = params.toString();
+    });
+  </script>
 </Layout>

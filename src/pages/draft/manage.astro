@@ -115,8 +115,12 @@ const domain = Astro.url.origin;
       <p class="text-accent-primary text-sm p-2">Category</p>
     </div>
     <Category selectedCategory={data[0].category} />
-    <div class="flex justify-end w-full">
+    <div class="flex justify-end w-full gap-4">
       <a
+          href={`/draft/editor?id=${id}`}
+        class="px-10 border m-2 border-accent-primary rounded-xl py-2">Change content</a
+      >
+            <a
         href=`/draft/${id}`
         class="px-10 border m-2 border-accent-primary rounded-xl py-2">Review</a
       >

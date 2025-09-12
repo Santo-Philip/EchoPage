@@ -12,6 +12,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   }
       const email: string[] = import.meta.env.EMAIL.split(",");
       const user = await supabase.auth.getUser();
+
       if (!user.data.user || !email.includes(user.data.user.email || '')) {
           return redirect("/dashboard");
       }

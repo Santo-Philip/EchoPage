@@ -3,6 +3,15 @@ import { supabase } from "@/lib/supabase";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
      const origin = new URL(request.url).origin;
+     const emails: string[] = import.meta.env.EMAIL.split(",");
+    const user = await supabase.auth.getUser();
+  const email = user.data.user?.email;
+
+  if (!email || !emails.includes(email)) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
 
   if (origin !== import.meta.env.SITE) {
     return new Response(JSON.stringify({ error: "Invalid request origin" }), {
