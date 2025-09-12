@@ -14,13 +14,13 @@ const {data ,  error} = await supabase.from('draft').select('*').eq('category', 
       <div id="articles-container" class="grid gap-4"></div>
       <div id="skeletons" class=" grid gap-4">
         {data?.map((article) => (
-          <div class="flex gap-3">
+          <a href={`/b/${article.category}/${article.slug}`} class="flex gap-3">
             <OptimizedImage src={article.thumb} alt={article.title} class="w-28 h-20 object-cover rounded-md" />
             <div class="flex-1 space-y-2">
               <h3 class="text-sm font-semibold">{article.title}</h3>
               <p class="text-sm line-clamp-3 text-text-secondary">{article.desc}</p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
       {error ? (
