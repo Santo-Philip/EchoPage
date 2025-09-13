@@ -15,7 +15,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
   }
 
   const user = await supabase.auth.getUser();
-  if (!user.data.user) {
+  if (!user.data.user?.id) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
