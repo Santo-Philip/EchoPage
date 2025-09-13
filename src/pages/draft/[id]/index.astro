@@ -149,19 +149,23 @@ import autoSave from "@/lib/blogs/autosave";
   if (mkdraft) {
     mkdraft.addEventListener("click", async () => {
       autoSave(article?.id || '', { status: 'pending' });
+      window.location.reload();
     })}
   if (mkpublic) {
     mkpublic.addEventListener("click", async () => {
       autoSave(article?.id || '', { status: 'public' });
+      window.location.reload();
     })}
   if (feature) {
     feature.addEventListener("click", async () => {
       autoSave(article?.id || '', { featured: true });
+      window.location.reload();
     })}
 
   if (unfeature) {
     unfeature.addEventListener("click", async () => {
       autoSave(article?.id || '', { featured: false });
+      window.location.reload();
     })}
 
   const id = article?.id || '';
