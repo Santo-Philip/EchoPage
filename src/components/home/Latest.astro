@@ -1,8 +1,6 @@
 ---
 import { supabase } from "@/lib/supabase"
 import OptimizedImage from "./OptimizedImage.astro";
-import { iconMap } from "@/lib/blogs/icons";
-import Icon from "node_modules/@lucide/astro/src/Icon.astro";
 
 const { data: mainArticle } = await supabase
   .from("draft")
@@ -38,8 +36,8 @@ const { data: categories } = await supabase
           alt={mainArticle.slug} 
           class=" aspect-video" 
         />
-        <div class="absolute inset-0 bg-gradient-to-t text-bg-primary from-text-primary/70 via-text-primary/30 to-transparent p-6 flex flex-col justify-end">
-          <p class="text-xl md:text-2xl font-bold text-bg-primary group-hover:text-blue-400 transition">
+        <div class="absolute inset-0 bg-gradient-to-t text-white from-black/70 via-black/30 to-transparent p-6 flex flex-col justify-end">
+          <p class="text-xl md:text-2xl font-bold">
             {mainArticle.title}
           </p>
         </div>
