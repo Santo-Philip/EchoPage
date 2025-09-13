@@ -8,8 +8,10 @@ const { data, error } = await supabase
   .select("*")
   .eq("id", id)
   .single();
-const user = await supabase.auth.getUser();
 
+const email: string[] = import.meta.env.EMAIL.split(",");  
+const user = await supabase.auth.getUser();
+const userEmail = user.data.user?.email || '';
 ---
 
 <Layout title={data?.title || "Draft"} desc="Draft details">
@@ -28,7 +30,7 @@ const user = await supabase.auth.getUser();
     )}
 
     {data ? (
-      <article class="space-y-6">
+      <article class="space-y-6" id={data.id}>
 
         <header>
           <h1 class="text-3xl font-bold text-gray-900">
@@ -53,22 +55,83 @@ const user = await supabase.auth.getUser();
           set:html={data.content_html}
         >
         </div>
+        {data.category && (
+          <p class="text-sm text-text-secondary">
+            Category: <span class="font-medium">{data.category}</span>
+          </p>
+        )}
+        {data.tags && data.tags.length > 0 && (
+          <p class="text-sm text-text-secondary">
+            Tags:{" "}
+            {data.tags.map((tag: string, index: number) => (
+              <span class="font-medium">
+                {tag}
+                {index < data.tags.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </p>
+        )
+
+        }
+        {data.keywords && data.keywords.length > 0 && (
+          <p class="text-sm text-text-secondary">
+            Keywords:{" "} <br/>
+            {data.keywords.map((keyword: string, index: number) => (
+              <span class="font-medium">
+                {keyword}
+                {index < data.keywords.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </p>
+        )}
+        <p class="text-sm text-text-secondary">
+         Slug : {data.slug || 'not set'}
+        </p>
         {data.author === user.data.user?.id && (
    
-        <div class="flex flex-wrap justify-end gap-3 pt-6 border-t">
+        <div class="flex flex-wrap justify-center gap-3 pt-6 border-t">
 
           <a
             href={`/draft/manage?id=${id}`}
-            class="px-4 py-2 rounded-lg bg-accent-hover text-white transition"
+            class="px-4 py-2 rounded-full border border-accent-primary"
           >
             Manage
           </a>
           <a
             href={`/draft/editor?id=${id}`}
-            class="px-8 py-2 rounded-lg bg-green-500 text-white transition"
+            class="px-8 py-2 rounded-full border border-accent-primary "
           >
             Edit
           </a>
+        </div>
+             )}
+
+      {email.includes(userEmail) && (
+        <div class="border-l-4 rounded-xl border-accent-primary  p-4 ">
+          <h2 class="font-semibold">Admin Settings</h2>
+          <p class="text-sm text-text-secondary">
+            Manage this post from here
+          </p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-3 pt-6">
+          {data.status === 'public' ? (
+            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Draft</button>
+          ) : (
+            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Public</button>
+          )}
+          {data.status === 'archive' ? (
+            <button class="px-4 py-2 rounded-full border border-amber-400">Unarchive</button>
+          ) : (
+            <button class="px-4 py-2 rounded-full border border-amber-400">Archive</button>
+          )}
+          {data.featured === true ? (
+            <button class="px-4 py-2 rounded-full border border-accent-primary">Unfeature</button>
+          ) : (
+            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Featured</button>
+          )}
+            <button id="remove-button" class="px-4 py-2 rounded-full border border-red-500">
+              Remove
+            </button>
         </div>
              )}
       </article>
@@ -77,3 +140,33 @@ const user = await supabase.auth.getUser();
     )}
   </div>
 </Layout>
+<script>
+
+  const removeButton = document.getElementById("remove-button");
+  const article = document.querySelector("article");
+  const id = article?.id || '';
+  removeButton?.addEventListener("click", async () => {
+    if (confirm("Are you sure you want to remove this draft? This action cannot be undone.")) {
+      try {
+        const response = await fetch("/api/crud/data/remove", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: {id} }),
+        });
+
+        if (response.ok) {
+          alert("Draft removed successfully.");
+          window.location.href = "/a/review";
+        } else {
+          const errorData = await response.json();
+          alert("Error removing draft: " + (errorData.message || "Unknown error"));
+        }
+      } catch (error) {
+        // @ts-ignore
+        alert("Error removing draft: " + error.message);
+      }
+    }
+  });
+</script>

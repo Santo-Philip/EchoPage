@@ -1,4 +1,5 @@
 ---
+import OptimizedImage from "@/components/home/OptimizedImage.astro";
 import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
 
@@ -15,76 +16,118 @@ const emails: string[] = import.meta.env.EMAIL.split(",");
 if (!emails.includes(user.email || '')) {
   return Astro.redirect("/");
 }
+const url = new URL(Astro.request.url);
 
-const { data: reviewData, error: reviewError } = await supabase
+const page = parseInt(url.searchParams.get("page") || "1", 10);
+const perPage = parseInt(url.searchParams.get("perPage") || "6", 10);
+const status = url.searchParams.get("status") || "public";
+const type = url.searchParams.get("type") || "blog";
+const category = url.searchParams.get("category") || "";
+
+const offset = (page - 1) * perPage;
+const now = new Date().toISOString();
+
+const { data: authData, error: authError } = await supabase.auth.getUser();
+if (authError || !authData.user?.id) {
+  return Astro.redirect("/");
+}
+const categories = await supabase.from('categories').select('*').order('title', { ascending: true });
+
+let query = supabase
   .from("draft")
   .select("*")
-  .eq("status", "pending")
-  .order("created_at", { ascending: false });
+  .eq("status", status)
+  .or(`schedule.lte.${now},schedule.is.null`)
+  .order("created_at", { ascending: false })
+  .range(offset, offset + perPage - 1);
 
-const successMsg = Astro.url.searchParams.get("success");
-const errorMsg = Astro.url.searchParams.get("error");
+if (category) query = query.eq("category", category);
 
+const { data: posts, error: queryError } = await query;
+if (queryError) throw new Error(queryError.message);
+
+const nextPage = posts.length === perPage ? page + 1 : null;
+const prevPage = page > 1 ? page - 1 : null;
 ---
-<Layout title="Post Review" desc="Review and manage posts">
-  <section class="max-w-screen-lg min-h-screen mx-auto px-2 py-8">
 
-    {successMsg && (
-      <div class="bg-green-500 text-white p-4 rounded-md mb-4">
-        {successMsg}
+<Layout title="Post Review" desc="Review and manage posts">
+  <div class="max-w-5xl mx-auto min-h-screen space-y-6  py-8">
+    <h1 class="text-2xl font-bold text-center">Blog Management</h1>
+    <p class="text-center text-gray-500">Manage and review your posts here.</p>
+    <form method="GET" class="flex px-2 flex-wrap gap-4 ">
+      <select name="status" class="border bg-bg-secondary px-3 py-2 rounded-full">
+        <option value="public" selected={status==="public"}>Public</option>
+        <option value="pending" selected={status==="pending"}>Pending</option>
+        <option value="archive" selected={status==="archive"}>Archived</option>
+      </select>
+      {categories.data && categories.data.length > 0 && (
+        <select name="category" class="border bg-bg-secondary px-3 py-2 rounded-full">
+          <option value="" selected={!category}>All Categories</option>
+          {categories.data.map((cat) => (
+            <option value={cat.slug} selected={category === cat.slug}>
+              {cat.title}
+            </option>
+          ))}
+        </select>
+      )}
+      </select>
+      <input type="hidden" name="page" value="1" />
+      <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-full">Apply</button>
+    </form>
+
+    <div class="grid grid-cols-1 md:px-2 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      {posts.length === 0 && (
+        <p class="col-span-full text-center text-gray-500">No posts found.</p>
+      )}
+     {posts.map((post) => (
+  <div class="md:border md:border-text-muted rounded-lg bg-bg-secondary shadow overflow-hidden">
+    <!-- Thumbnail + title -->
+    <a href={`/draft/${post.id}`} class="relative block">
+      <OptimizedImage class="rounded-t-lg" src={post.thumb} alt={post.title} />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-2 flex flex-col justify-end">
+        <p class="font-bold text-white line-clamp-2">
+          {post.title || "Untitled"}
+        </p>
       </div>
-    )
-    }
-    {errorMsg && (
-      <div class="bg-red-500 text-white p-4 rounded-md mb-4">
-        {errorMsg}
+    </a>
+
+    <!-- Dropdown for details -->
+    <details class="p-2 group">
+      <summary class="flex items-center justify-between cursor-pointer text-sm text-gray-700">
+        <span>Show details</span>
+        <span class="transition-transform group-open:rotate-180">▼</span>
+      </summary>
+
+      <div class="mt-2 space-y-1 text-sm text-gray-600">
+        <p class="text-sm text-gray-500">{post.desc || "No description"}</p>
+        <p><span class="font-semibold">Category:</span> {post.category}</p>
+        <p><span class="font-semibold">Status:</span> {post.status}</p>
+        <p class="text-xs text-gray-400">
+          <span class="font-semibold">Updated:</span>{" "}
+          {new Date(post.updated_at).toLocaleDateString()}
+        </p>
+  
       </div>
-    )}
-    <h1 class="text-3xl font-bold text-gray-900">Post Management</h1>
-    <p class="text-text-secondary text-sm mb-4">
-        Manage all post and approve or review posts here.
-    </p>
-    {reviewError && (
-      <p class="text-red-500">Error loading posts: {reviewError.message}</p>
-    )}
-    {reviewData && reviewData.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-        {reviewData.map((post) => (
-          <div class="border border-text-muted rounded-2xl shadow-sm" id={post.id}>
-            <a href={`/draft/${post.id}`}>
-            <img
-              src={post.thumb || '/default-thumb.png'}
-              alt={post.title || 'Thumbnail'}
-              class="aspect-video rounded-2xl object-cover mb-4"
-            />
-            <h2 class="font-medium text-lg p-2">{post.title || "Untitled"}</h2>
-            <p class="text-text-secondary flex-grow p-2">{post.desc || "No description provided."}</p>
-            </a>
-            <div class="mt-4 flex">
-                <form action="/api/crud/data/review" class="w-full" method="post">
-                  <input type="hidden" name="id" value={post.id} />
-                  <input type="hidden" name="status" value="public" />
-              <button
-                class="bg-blue-500 w-full hover:bg-blue-600 text-white p-4 text-center rounded-bl-xl text-sm shadow transition"
-              >
-                Accept
-              </button>
-              </form>
-              <form action="/api/crud/data/review" class="w-full" method="post">
-                  <input type="hidden" name="id" value={post.id} />
-                  <input type="hidden" name="status" value="reject" />
-              <button
-                class="bg-red-500 w-full hover:bg-red-600 text-white p-4 text-center rounded-br-xl text-sm shadow transition"
-              >
-                Reject
-              </button>
-              </form>
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <p class="text-gray-500">No posts pending review.</p>
-    )}
-  </section>
+    </details>
+  </div>
+))}
+
+
+    </div>
+    <div class="flex justify-center items-center gap-4 mt-6">
+      {prevPage && (
+        <a
+          href={`?status=${status}&category=${category}&page=${prevPage}&perPage=${perPage}`}
+          class="px-4 py-2 bg-gray-200 rounded"
+        >Prev</a>
+      )}
+      <span class="text-gray-600">Page {page}</span>
+      {nextPage && (
+        <a
+          href={`?status=${status}&category=${category}&page=${nextPage}&perPage=${perPage}`}
+          class="px-4 py-2 bg-gray-200 rounded"
+        >Next</a>
+      )}
+    </div>
+  </div>
 </Layout>

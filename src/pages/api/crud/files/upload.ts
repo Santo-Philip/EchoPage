@@ -4,6 +4,13 @@ import type { APIRoute } from 'astro';
 export const POST: APIRoute = async ({ request }) => {
    const origin = new URL(request.url).origin;
 
+   const user = await supabase.auth.getUser();
+   if (!user.data.user) {
+     return new Response(JSON.stringify({ error: "Unauthorized" }), {
+       status: 401,
+     });
+   }
+
   if (origin !== import.meta.env.SITE) {
     return new Response(JSON.stringify({ error: "Invalid request origin" }), {
       status: 400,
