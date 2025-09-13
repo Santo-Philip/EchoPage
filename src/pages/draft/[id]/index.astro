@@ -115,19 +115,14 @@ const userEmail = user.data.user?.email || '';
         </div>
         <div class="flex flex-wrap justify-center gap-3 pt-6">
           {data.status === 'public' ? (
-            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Draft</button>
+            <button id="mkdraft" class="px-4 py-2 rounded-full border border-accent-primary">Make Draft</button>
           ) : (
-            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Public</button>
-          )}
-          {data.status === 'archive' ? (
-            <button class="px-4 py-2 rounded-full border border-amber-400">Unarchive</button>
-          ) : (
-            <button class="px-4 py-2 rounded-full border border-amber-400">Archive</button>
+            <button id="mkpublic" class="px-4 py-2 rounded-full border border-accent-primary">Make Public</button>
           )}
           {data.featured === true ? (
-            <button class="px-4 py-2 rounded-full border border-accent-primary">Unfeature</button>
+            <button id="unfeature" class="px-4 py-2 rounded-full border border-accent-primary">Unfeature</button>
           ) : (
-            <button class="px-4 py-2 rounded-full border border-accent-primary">Make Featured</button>
+            <button id="feature" class="px-4 py-2 rounded-full border border-accent-primary">Make Featured</button>
           )}
             <button id="remove-button" class="px-4 py-2 rounded-full border border-red-500">
               Remove
@@ -141,9 +136,34 @@ const userEmail = user.data.user?.email || '';
   </div>
 </Layout>
 <script>
+import autoSave from "@/lib/blogs/autosave";
+
 
   const removeButton = document.getElementById("remove-button");
   const article = document.querySelector("article");
+  const mkdraft = document.getElementById("mkdraft");
+  const mkpublic = document.getElementById("mkpublic");
+  const feature = document.getElementById("feature");
+  const unfeature = document.getElementById("unfeature");
+
+  if (mkdraft) {
+    mkdraft.addEventListener("click", async () => {
+      autoSave(article?.id || '', { status: 'draft' });
+    })}
+  if (mkpublic) {
+    mkpublic.addEventListener("click", async () => {
+      autoSave(article?.id || '', { status: 'public' });
+    })}
+  if (feature) {
+    feature.addEventListener("click", async () => {
+      autoSave(article?.id || '', { featured: true });
+    })}
+
+  if (unfeature) {
+    unfeature.addEventListener("click", async () => {
+      autoSave(article?.id || '', { featured: false });
+    })}
+    
   const id = article?.id || '';
   removeButton?.addEventListener("click", async () => {
     if (confirm("Are you sure you want to remove this draft? This action cannot be undone.")) {
@@ -161,11 +181,11 @@ const userEmail = user.data.user?.email || '';
           window.location.href = "/a/review";
         } else {
           const errorData = await response.json();
-          window.showToast("Error removing draft: " + (errorData.message || "Unknown error"));
+          window.showToast("Error removing draft: " + (errorData.message || "Unknown error"), 3000, "error");
         }
       } catch (error) {
         // @ts-ignore
-        alert("Error removing draft: " + error.message);
+        window.showToast("Error removing draft: " + error.message, 3000, "error");
       }
     }
   });

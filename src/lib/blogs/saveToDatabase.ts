@@ -15,6 +15,7 @@ export interface DraftContent {
   keywords?: string[];
   author?: string;
   schedule? : string;
+  featured?: boolean;
 }
 
 async function saveToDatabase(blogId: string, data: DraftContent) {
