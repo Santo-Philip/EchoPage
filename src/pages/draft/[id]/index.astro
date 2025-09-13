@@ -148,7 +148,7 @@ import autoSave from "@/lib/blogs/autosave";
 
   if (mkdraft) {
     mkdraft.addEventListener("click", async () => {
-      autoSave(article?.id || '', { status: 'draft' });
+      autoSave(article?.id || '', { status: 'pending' });
     })}
   if (mkpublic) {
     mkpublic.addEventListener("click", async () => {
@@ -163,7 +163,7 @@ import autoSave from "@/lib/blogs/autosave";
     unfeature.addEventListener("click", async () => {
       autoSave(article?.id || '', { featured: false });
     })}
-    
+
   const id = article?.id || '';
   removeButton?.addEventListener("click", async () => {
     if (confirm("Are you sure you want to remove this draft? This action cannot be undone.")) {

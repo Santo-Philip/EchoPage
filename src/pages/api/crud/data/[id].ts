@@ -63,7 +63,7 @@ export const PATCH: APIRoute = async ({ request, params }) => {
     });
   }
   if (
-    data.status === "public" || data.status === "reject" &&
+    (data.status === "public" || data.status === "reject") &&
     !email.includes(user.data.user.email || "")
   ) {
     return new Response(JSON.stringify({ error: "Not Allowed to publish" }), {
