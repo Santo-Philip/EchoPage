@@ -21,9 +21,10 @@ if (error || post.length == null || post.length === 0) {
   return Astro.redirect("/404");
 }
 
+const img = post[0]?.thumb || import.meta.env.LOGO || "/logo.ico";
 ---
 
-<Layout title={post[0]?.title || "Post"} keywords={post[0]?.keywords || post[0]?.slug} desc={post[0]?.desc || "Blog post"} img={post[0]?.thumb || undefined} >
+<Layout title={post[0]?.title || "Post"} keywords={post[0]?.keywords || post[0]?.slug} desc={post[0]?.desc || "Blog post"} img={img} >
   <div class="max-w-screen-md mx-auto min-h-screen space-y-6">
     {error && (
       <div class="p-4 border border-red-300 bg-red-50 text-red-700 rounded">

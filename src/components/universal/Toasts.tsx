@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 
 declare global {
   interface Window {
-    showToast: (message: string, duration?: number) => void;
+    showToast: (message: string, duration?: number , type?: 'info' | 'error' | 'success') => void;
   }
 }
 
-type Toast = { id: number; message: string };
+type Toast = { id: number; message: string, duration?: number, type?: 'info' | 'error' | 'success' };
 
 export default function Toasts() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -18,13 +18,11 @@ export default function Toasts() {
         setToasts((prev) => [...prev, { id, message }]);
 
         setTimeout(() => {
-          // trigger fade out by adding a class
           const toastEl = document.getElementById(`toast-${id}`);
           if (toastEl) toastEl.classList.add("toast-hide");
-          // remove after animation
           setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
-          }, 500); // match animation duration
+          }, 500);
         }, duration);
       };
     }
@@ -34,7 +32,7 @@ export default function Toasts() {
     <>
       <div className="toast-container min-w-screen-lg">
         {toasts.map((t) => (
-          <div id={`toast-${t.id}`} key={t.id} className="toast ">
+          <div id={`toast-${t.id}`} key={t.id} className="toast " style={{ backgroundColor: t.type === 'error' ? '#e74c3c' : t.type === 'success' ? '#2ecc71' : '#333' }}>
             {t.message}
           </div>
         ))}
@@ -58,7 +56,6 @@ export default function Toasts() {
           }
 
           .toast {
-            background-color: #0077ff;
             color: white;
             padding: 12px 20px;
             border-radius: 8px;

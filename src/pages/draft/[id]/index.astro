@@ -157,11 +157,11 @@ const userEmail = user.data.user?.email || '';
         });
 
         if (response.ok) {
-          alert("Draft removed successfully.");
+          window.showToast("Draft removed!");
           window.location.href = "/a/review";
         } else {
           const errorData = await response.json();
-          alert("Error removing draft: " + (errorData.message || "Unknown error"));
+          window.showToast("Error removing draft: " + (errorData.message || "Unknown error"));
         }
       } catch (error) {
         // @ts-ignore
