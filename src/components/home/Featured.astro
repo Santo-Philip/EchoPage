@@ -6,6 +6,7 @@ const { data: featured } = await supabase
   .from("draft")
   .select("*")
   .eq("status", "public")
+  .eq("featured", true)
   .order("created_at", { ascending: false })
   .limit(1)
   .single();
@@ -14,6 +15,7 @@ let { data: sideArticles } = await supabase
   .from("draft")
   .select("*")
   .eq("status", "public")
+  .eq("featured", false)
   .order("created_at", { ascending: false })
   .limit(4);
 
