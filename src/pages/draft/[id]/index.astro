@@ -149,9 +149,8 @@ import autoSave from "@/lib/blogs/autosave";
   if (mkdraft) {
     mkdraft.addEventListener("click", async () => {
       const val = await autoSave(article?.id || '', { status: 'pending' });
-      console.log(val);
       if (val === true) {
-        // window.location.reload(); 
+        window.location.reload(); 
       } else {
         window.showToast('Something went wrong', 3000, 'error');
       }
