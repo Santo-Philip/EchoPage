@@ -30,7 +30,11 @@ export default function EditorPage({ savedContent }: EditorPageProps) {
   useEffect(() => {
     if (!editor) return;
 
-    const cleanupImageDeletion = watchImageDeletion(editor, deleteFileFromApi, setError);
+    const cleanupImageDeletion = watchImageDeletion(
+      editor,
+      deleteFileFromApi,
+      setError
+    );
     const cleanupWordCount = trackWordCount(editor, setWordCount);
     const cleanupAutoSave = handleAutoSave(editor);
 
@@ -60,9 +64,13 @@ export default function EditorPage({ savedContent }: EditorPageProps) {
           disabled={submitting}
           onClick={async () => {
             setSubmitting(true);
-            const {title} = extractTitleAndDescription(editor.getJSON())
-            const slug = await slugify(title)
-            autoSave(getSearchParam("id"), {slug})
+
+            const { title } = extractTitleAndDescription(editor.getJSON());
+            const slug = await slugify(title);
+
+            autoSave(getSearchParam("id"), { slug });
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+
             window.location.href = `/draft/manage?id=${getSearchParam("id")}`;
           }}
           className="flex items-center gap-2 bg-accent-primary hover:bg-accent-hover text-text-primary cursor-pointer px-6 py-2 rounded-xl transition"
