@@ -148,24 +148,41 @@ import autoSave from "@/lib/blogs/autosave";
 
   if (mkdraft) {
     mkdraft.addEventListener("click", async () => {
-      autoSave(article?.id || '', { status: 'pending' });
-      window.location.reload();
+      const val = await autoSave(article?.id || '', { status: 'pending' });
+      if (val) {
+        window.location.reload(); 
+      } else {
+        window.showToast('Something went wrong', 3000, 'error');
+      }
     })}
   if (mkpublic) {
     mkpublic.addEventListener("click", async () => {
-      autoSave(article?.id || '', { status: 'public' });
-      window.location.reload();
+      const success = await autoSave(article?.id || '', { status: 'public' });
+      if (success) {
+              window.location.reload();
+      } else{
+        window.showToast('Something went wrong', 3000, 'error');
+      }
+
     })}
   if (feature) {
     feature.addEventListener("click", async () => {
-      autoSave(article?.id || '', { featured: true });
-      window.location.reload();
+      const success = await autoSave(article?.id || '', { featured: true });
+            if (success) {
+              window.location.reload();
+      } else{
+        window.showToast('Something went wrong', 3000, 'error');
+      }
     })}
 
   if (unfeature) {
     unfeature.addEventListener("click", async () => {
-      autoSave(article?.id || '', { featured: false });
-      window.location.reload();
+      const success = await autoSave(article?.id || '', { featured: false });
+            if (success) {
+              window.location.reload();
+      } else{
+        window.showToast('Something went wrong', 3000, 'error');
+      }
     })}
 
   const id = article?.id || '';

@@ -29,12 +29,14 @@ async function saveToDatabase(blogId: string, data: DraftContent) {
     });
 
     if (!response.ok) {
-
-      return window.showToast('Something went wrong', 3000, 'error');
+window.showToast('Something went wrong', 3000, 'error');
+      return false;
     }
+    return true;
   } catch (err) {
     console.error("Failed to save to Supabase:", err);
-    return window.showToast('Something went wrong', 3000, 'error');
+    window.showToast('Something went wrong', 3000, 'error');
+    return false
   }
 }
 
