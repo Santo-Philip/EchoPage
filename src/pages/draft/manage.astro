@@ -4,7 +4,7 @@ import SeoPreview from "@/components/articles/searchPreview";
 import ThumbnailUploader from "@/components/articles/ThumbnailUploader";
 import Category from "@/components/articles/Category.astro";
 import Layout from "@/layouts/Layout.astro";
-import langauges from "@/lib/languages";
+import languages from "@/lib/languages";
 import { supabase } from "@/lib/supabase";
 
 const id = Astro.url.searchParams.get("id");
@@ -121,7 +121,7 @@ const domain = Astro.url.origin;
         class="px-10 border m-2 border-accent-primary rounded-xl py-2">Change content</a
       >
             <a
-        href=`/draft/${id}`
+        href={`/draft/${id}`}
         class="px-10 border m-2 border-accent-primary rounded-xl py-2">Review</a
       >
     </div>
@@ -183,7 +183,7 @@ const domain = Astro.url.origin;
         >
           <option value="">Select Language</option>
           {
-            Object.entries(langauges).map(([code, name]) => (
+            Object.entries(languages).map(([code, name]) => (
               <option value={code} selected={data[0].language === code}>
                 {name}
               </option>
@@ -349,47 +349,70 @@ Notes:
         }
         window.location.reload();
       });
+    </script>
+  </div>
+</Layout>
 
-      function watchAndSave(
-        element: HTMLDivElement,
-        fieldName: string,
-        asArray = false
-      ) {
-        function extractValue() {
-          let value: string | string[] = element.innerText.trim();
-          if (asArray) {
-            value = [
-              ...new Set(
-                value
-                  .split(",")
-                  .map((v) => v.trim())
-                  .filter(Boolean)
-              ),
-            ];
-          }
+<script>
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
 
-          autoSave(id, { [fieldName]: value });
-        }
-        element.addEventListener("input", extractValue);
-        const observer = new MutationObserver(() => {
-          extractValue();
-        });
+const id = getSearchParam("id")
+        document.addEventListener("categoryChange", (e) => {
+        autoSave(id, { category: (e as CustomEvent).detail.category });
+      });
+</script>
 
-        observer.observe(element, {
-          childList: true,
-          characterData: true,
-          subtree: true,
-        });
-      }
+<script>
+import autoSave from "@/lib/blogs/autosave";
+import { getSearchParam } from "@/lib/blogs/getParams";
+      const title = document.getElementById("title") as HTMLDivElement;
+      const desc = document.getElementById("desc") as HTMLDivElement;
+      const tags = document.getElementById("tags") as HTMLDivElement;
+      const keywords = document.getElementById("keywords") as HTMLDivElement;
+const id = getSearchParam("id")
+
+  function watchAndSave(
+  element: HTMLDivElement,
+  fieldName: string,
+  asArray = false
+) {
+  let timeout: number | undefined;
+
+  function extractValue() {
+    let value: string | string[] = element.innerText.trim();
+    if (asArray) {
+      value = value
+        .split(",")
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+    }
+    return value;
+  }
+
+  function scheduleSave() {
+    clearTimeout(timeout);
+    timeout = window.setTimeout(() => {
+      const val = extractValue();
+      autoSave(id, { [fieldName]: val });
+    }, 500);
+  }
+
+
+  const observer = new MutationObserver(scheduleSave);
+  observer.observe(element, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+  element.addEventListener("blur", () => {
+    const val = extractValue();
+    autoSave(id, { [fieldName]: val });
+  });
+}
 
       watchAndSave(title, "title");
       watchAndSave(desc, "desc");
       watchAndSave(keywords, "keywords", true);
       watchAndSave(tags, "tags", true);
-
-      document.addEventListener("categoryChange", (e) => {
-        autoSave(id, { category: (e as CustomEvent).detail.category });
-      });
-    </script>
-  </div>
-</Layout>
+</script>

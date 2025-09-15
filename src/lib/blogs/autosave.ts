@@ -5,6 +5,7 @@ let saveTimeout: ReturnType<typeof setTimeout>;
 
 
 function autoSave(blogId: string, content: DraftContent) {
+  console.log(content)
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
   saveToDatabase(blogId,content)
